@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+	template="/WEB-INF/templates/template_main.xhtml">
+	
+	<ui:define name="security">
+		<h:body onload="#{loginController.permisoValidado('FACTURACION')}">
+		</h:body>
+	</ui:define>
+		
+	<ui:define name="head">
+		<title>Facturación</title>
+
+	</ui:define>
+
+	<ui:define name="content">
+		<!--BEGIN CONTENT-->
+		<div class="content">
+			<section class="content-header">
+				<div class="pull-left" style="padding-top: 8px;"></div>
+				<div class="pull-right">
+					<ol class="breadcrumb">
+						<li><a href="#{request.contextPath}/pages/dashboard.xhtml"
+							style="color: #0090FF; font-size: 12px;">Inicio</a></li>
+						<li><a
+							href="#{request.contextPath}/pages/proceso/orden_servicio_index.xhtml"
+							style="color: #0090FF; font-size: 12px;">Venta</a></li>
+						<li class="active" style="font-size: 12px;">Facturación</li>
+					</ol>
+				</div>
+			</section>
+			<section class="main-content">
+				<section class="main-content">
+					<div class="row">
+
+						<section class="main-content" style="background-color: #f9fafa;">
+							<div class="row">
+								<div class="col-md-3 col-sm-6">
+									<div class="panel panel-stat stat-success" onclick="location.href='#{request.contextPath}/pages/venta/factura.xhtml'">
+										<div class="panel-body">
+											<div class="row mbxl">
+												<div class="col-xs-8">
+													<span class="stat-title">#{''}</span>
+													<h2 class="man"><h:outputText value="&#160;" /></h2>
+												</div>
+												<div class="col-xs-4">
+													<i class="	glyphicon glyphicon-qrcode"></i>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col-md-12">
+													<span class="stat-title"><h3>NUEVA FACTURA</h3></span>
+												</div>
+												
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-3 col-sm-6">
+									<div class="panel panel-stat stat-primary" onclick="location.href='#{request.contextPath}/pages/venta/caja.xhtml'">
+										<div class="panel-body">
+											<div class="row mbxl">
+												<div class="col-xs-8">
+													<span class="stat-title">#{''}</span>
+													<h2 class="man"><h:outputText value="&#160;" /></h2>
+												</div>
+												<div class="col-xs-4">
+													<i class=" icon-screen-desktop"></i>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col-md-12">
+													<span class="stat-title"><h3>CAJA </h3></span>
+												</div>
+												
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-3 col-sm-6">
+									<div class="panel panel-stat stat-warning" onclick="location.href='#{request.contextPath}/pages/venta/factura_concepto.xhtml'">
+										<div class="panel-body">
+											<div class="row mbxl">
+												<div class="col-xs-8">
+													<span class="stat-title">#{''}</span>
+													<h2 class="man"><h:outputText value="&#160;" /></h2>
+												</div>
+												<div class="col-xs-4">
+													<i class="glyphicon glyphicon-file"></i>
+												</div>
+											</div>
+											
+											<div class="row">
+												<div class="col-md-12" style="width: 100%">
+													<span class="stat-title"><h3>Factura Concepto</h3></span>
+												</div>
+												
+											</div>
+										</div>
+									</div>
+								</div>
+								
+
+							</div>
+
+
+						</section>
+
+
+					</div>
+				</section>
+			</section>
+		</div>
+
+		<!--END CONTENT-->
+
+		<!-- START GROWL formGrowl:msgs1 -->
+		<h:form id="formGrowl">
+			<p:growl id="msgs1" showDetail="true" />
+		</h:form>
+		<!-- END GROWL -->
+
+
+	</ui:define>
+
+	<ui:insert name="scripts">
+
+	</ui:insert>
+</ui:composition>

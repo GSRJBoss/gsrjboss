@@ -1,0 +1,467 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+	template="/WEB-INF/templates/template_main.xhtml">
+
+	<ui:define name="head">
+		<title>Configuración</title>
+
+		<f:event listener="#{configuracionVentaController.initConversation}"
+			type="preRenderView"></f:event>
+
+	</ui:define>
+
+	<ui:define name="content">
+		<!--BEGIN CONTENT-->
+		<div class="content">
+			<section class="main-content"
+				style="background-color: #f5f6f6; padding-top: 0px;">
+				<h:form id="form001">
+					<!-- BEGIN BUTTONS -->
+					<div class="row" style="background-color: #f9fafa;">
+						<section class="content-header">
+							<div class="pull-left"
+								style="padding-top: 8px; padding-left: 15px;">
+								<div class="btn-group-demo">
+									<div class="btn-group">
+										<p:commandLink id="buttonCancelar" value="&#160; Cancelar"
+											styleClass="btn btn-warning ion-minus-circled"
+											style="height:31px; padding:center" immediate="true"
+											rendered="#{configuracionVentaController.registrar}"
+											update="form001"
+											action="#{configuracionVentaController.loadDefault()}">
+										</p:commandLink>
+
+										<p:commandLink id="buttonRegistrar" value="&#160; Registrar"
+											styleClass="btn btn-success ion-checkmark"
+											rendered="#{configuracionVentaController.registrar}"
+											style="height:31px;"  >
+											<p:ajax update="form001" listener="#{configuracionVentaController.registrarConfiguracionVenta()}" />
+										</p:commandLink>
+
+										<p:commandLink id="buttonModificar" value="&#160; Modificar"
+											rendered="#{configuracionVentaController.modificar}"
+											styleClass="btn btn-primary ion-edit" style="height:31px;"
+											update="form001" immediate="true"
+											action="#{configuracionVentaController.actionModificar()}">
+										</p:commandLink>
+
+									</div>
+								</div>
+							</div>
+							<div class="pull-right">
+								<ol class="breadcrumb">
+									<li><a href="#{request.contextPath}/index"
+										style="color: #0090FF; font-size: 12px;">Inicio</a></li>
+									<li><a href="#{request.contextPath}/user"
+										style="color: #0090FF; font-size: 12px;">Venta</a></li>
+									<li class="active" style="font-size: 12px;">Configuración</li>
+								</ol>
+							</div>
+						</section>
+					</div>
+					<!-- END BUTTONS -->
+
+					<!-- BEGIN PANEL REGISTER -->
+					<div class="row" style="padding-top: 10px;">
+
+						<div class="col-md-5">
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<h3 class="panel-title">Datos Configuración Venta</h3>
+								</div>
+								<div class="panel-body">
+									<div class="box-content form-horizontal">
+										<div class="form-group ">
+											<div class="col-md-4">Banco Moneda Nacional</div>
+											<div class="col-md-6">
+												<h:outputLabel
+													value="#{configuracionVentaController.selectedConfiguracionVenta.cuentaBancoNacional}"
+													rendered="#{configuracionVentaController.modificar}" />
+												<p:autoComplete id="bancoNacional" style="width: 100%"
+													inputStyle="width: 100%; color: #555555; background-image: none;"
+													value="#{configuracionVentaController.cuentaBancoNacional.descripcion}"
+													completeMethod="#{configuracionVentaController.completeCuentaAuxiliar}"
+													minQueryLength="2"
+													rendered="#{configuracionVentaController.registrar}"
+													forceSelection="true" var="_var" itemLabel="#{_var}"
+													itemValue="#{_var.descripcion}" placeholder="Cuenta"
+													maxResults="10">
+
+													<p:ajax event="itemSelect" update="bancoNacional"
+														listener="#{configuracionVentaController.onRowSelectCuentaBancoNacionalAuxiliarClick}" />
+
+													<p:column>
+														<h:outputText value="#{_var.codigoAuxiliar}" />
+													</p:column>
+
+													<p:column>
+														<h:outputText value="#{_var.descripcion}" />
+													</p:column>
+
+												</p:autoComplete>
+											</div>
+											<div class="col-md-2">
+												<p:commandLink id="buttonDlgCuenta1" immediate="true"
+													styleClass="btn btn-default ion-document-text"
+													style="height:27px; width: 31px;"
+													rendered="#{configuracionVentaController.registrar}">
+													<p:ajax
+															listener="#{configuracionVentaController.loadDialogCuenta()}" />
+												</p:commandLink>
+
+											</div>
+										</div>
+
+										<div class="form-group ">
+											<div class="col-md-4">Banco Moneda Extranjero</div>
+											<div class="col-md-6">
+												<h:outputLabel
+													value="#{configuracionVentaController.selectedConfiguracionVenta.cuentaBancoExtranjero}"
+													rendered="#{configuracionVentaController.modificar}" />
+												<p:autoComplete id="bancoExtranjero" style="width: 100%"
+													inputStyle="width: 100%; color: #555555; background-image: none;"
+													value="#{configuracionVentaController.cuentaBancoExtranjero.descripcion}"
+													completeMethod="#{configuracionVentaController.completeCuentaAuxiliar}"
+													minQueryLength="2"
+													rendered="#{configuracionVentaController.registrar}"
+													forceSelection="true" var="_var" itemLabel="#{_var}"
+													itemValue="#{_var.descripcion}" placeholder="Cuenta"
+													maxResults="10">
+
+													<p:ajax event="itemSelect" update="bancoExtranjero"
+														listener="#{configuracionVentaController.onRowSelectCuentaBancoExtranjeroAuxiliarClick}" />
+
+													<p:column>
+														<h:outputText value="#{_var.codigoAuxiliar}" />
+													</p:column>
+
+													<p:column>
+														<h:outputText value="#{_var.descripcion}" />
+													</p:column>
+
+												</p:autoComplete>
+											</div>
+
+											<div class="col-md-2">
+												<p:commandLink id="buttonDlgCuenta2" immediate="true"
+													styleClass="btn btn-default ion-document-text"
+													style="height:27px; width: 31px;"
+													rendered="#{configuracionVentaController.registrar}">
+													<p:ajax
+															listener="#{configuracionVentaController.loadDialogCuenta()}" />
+												</p:commandLink>
+
+											</div>
+										</div>
+
+										<div class="form-group ">
+											<div class="col-md-4">Cuenta Ingreso Por Venta</div>
+											<div class="col-md-6">
+												<h:outputLabel
+													value="#{configuracionVentaController.selectedConfiguracionVenta.cuentaIngresoPorVenta}"
+													rendered="#{configuracionVentaController.modificar}" />
+												<p:autoComplete id="cuentaingresoVenta" style="width: 100%"
+													inputStyle="width: 100%; color: #555555; background-image: none;"
+													value="#{configuracionVentaController.cuentaIngresoPorVenta}"
+													completeMethod="#{configuracionVentaController.completeCuentaAuxiliar}"
+													minQueryLength="2"
+													rendered="#{configuracionVentaController.registrar}"
+													forceSelection="true" var="_var" itemLabel="#{_var}"
+													itemValue="#{_var.descripcion}" placeholder="Cuenta"
+													maxResults="10">
+
+													<p:ajax event="itemSelect" update="cuentaingresoVenta"
+														listener="#{configuracionVentaController.onRowSelectCuentaIngresoPorVentaAuxiliarClick}" />
+
+													<p:column>
+														<h:outputText value="#{_var.codigoAuxiliar}" />
+													</p:column>
+
+													<p:column>
+														<h:outputText value="#{_var.descripcion}" />
+													</p:column>
+
+												</p:autoComplete>
+											</div>
+
+											<div class="col-md-2">
+												<p:commandLink  immediate="true"
+													styleClass="btn btn-default ion-document-text"
+													style="height:27px; width: 31px;"
+													rendered="#{configuracionVentaController.registrar}">
+													<p:ajax
+															listener="#{configuracionVentaController.loadDialogCuenta()}" />
+												</p:commandLink>
+
+											</div>
+										</div>
+										
+										<div class="form-group ">
+											<div class="col-md-4">Cuenta Tarjeta de Crédito</div>
+											<div class="col-md-6">
+												<h:outputLabel
+													value="#{configuracionVentaController.selectedConfiguracionVenta.cuentaTarjetaCredito}"
+													rendered="#{configuracionVentaController.modificar}" />
+												<p:autoComplete id="cuentatarjetacredito" style="width: 100%"
+													inputStyle="width: 100%; color: #555555; background-image: none;"
+													value="#{configuracionVentaController.cuentaTarjetaCredito}"
+													completeMethod="#{configuracionVentaController.completeCuentaAuxiliar}"
+													minQueryLength="2"
+													rendered="#{configuracionVentaController.registrar}"
+													forceSelection="true" var="_var" itemLabel="#{_var}"
+													itemValue="#{_var.descripcion}" placeholder="Cuenta"
+													maxResults="10">
+
+													<p:ajax event="itemSelect" update="cuentatarjetacredito"
+														listener="#{configuracionVentaController.onRowSelectCuentaTarjetaCreditoAuxiliarClick}" />
+
+													<p:column>
+														<h:outputText value="#{_var.codigoAuxiliar}" />
+													</p:column>
+
+													<p:column>
+														<h:outputText value="#{_var.descripcion}" />
+													</p:column>
+
+												</p:autoComplete>
+											</div>
+
+											<div class="col-md-2">
+												<p:commandLink  immediate="true"
+													styleClass="btn btn-default ion-document-text"
+													style="height:27px; width: 31px;"
+													rendered="#{configuracionVentaController.registrar}">
+													<p:ajax
+															listener="#{configuracionVentaController.loadDialogCuenta()}" />
+												</p:commandLink>
+
+											</div>
+										</div>
+										
+										<div class="form-group ">
+											<div class="col-md-4">Dto. Comisión Tarjeta Credito</div>
+											<div class="col-md-6">
+												<h:outputLabel
+													value="#{configuracionVentaController.selectedConfiguracionVenta.cuentaDescuentoTarjetaCredito}"
+													rendered="#{configuracionVentaController.modificar}" />
+												<p:autoComplete id="cuentodesccomisiontarjetacred" style="width: 100%"
+													inputStyle="width: 100%; color: #555555; background-image: none;"
+													value="#{configuracionVentaController.cuentaDescuentoTarjetoCredito}"
+													completeMethod="#{configuracionVentaController.completeCuentaAuxiliar}"
+													minQueryLength="2"
+													rendered="#{configuracionVentaController.registrar}"
+													forceSelection="true" var="_var" itemLabel="#{_var}"
+													itemValue="#{_var.descripcion}" placeholder="Cuenta"
+													maxResults="10">
+
+													<p:ajax event="itemSelect" update="cuentodesccomisiontarjetacred"
+														listener="#{configuracionVentaController.onRowSelectCuentaDescuentoComisionTarjetaAuxiliarClick}" />
+
+													<p:column>
+														<h:outputText value="#{_var.codigoAuxiliar}" />
+													</p:column>
+
+													<p:column>
+														<h:outputText value="#{_var.descripcion}" />
+													</p:column>
+
+												</p:autoComplete>
+											</div>
+
+											<div class="col-md-2">
+												<p:commandLink   immediate="true"
+													styleClass="btn btn-default ion-document-text"
+													style="height:27px; width: 31px;"
+													rendered="#{configuracionVentaController.registrar}">
+													<p:ajax
+															listener="#{configuracionVentaController.loadDialogCuenta()}" />
+												</p:commandLink>
+
+											</div>
+										</div>
+
+										<div class="form-group ">
+											<div class="col-md-4">Los Cobros se registran en
+												comprobantes de:</div>
+											<div class="col-md-8">
+												<h:outputLabel
+													value="#{configuracionVentaController.selectedConfiguracionVenta.tipoComprabante}"
+													rendered="#{configuracionVentaController.modificar}" />
+
+												<h:selectOneMenu id="tipoComprobante"
+													styleClass="input-sm form-control"
+													style=" color: #555555; height:25px; font-size:11px;"
+													immediate="true"
+													rendered="#{configuracionVentaController.registrar}"
+													value="#{configuracionVentaController.selectedConfiguracionVenta.tipoComprabante}">
+													<p:ajax event="change" />
+													<f:selectItem itemLabel="INGRESO" itemValue="INGRESO" />
+													<f:selectItem itemLabel="TRASPASO" itemValue="TRASPASO" />
+												</h:selectOneMenu>
+											</div>
+										</div>
+
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- END PANEL REGISTER -->
+				</h:form>
+			</section>
+		</div>
+		<!--END CONTENT-->
+
+		<!-- START GROWL -->
+		<h:form id="formGrowl">
+			<p:growl id="msgs1" showDetail="true" />
+		</h:form>
+		<!-- END GROWL -->
+
+		<!-- START DIALOG -->
+		<!-- PLAN DE CUENTA -->
+		<p:dialog header="SELECCION PLAN DE CUENTA" widgetVar="dlgPlanCuenta"
+			modal="true" visible="#{not empty facesContext.maximumSeverity}"
+			resizable="false" position="center" width="60%">
+			<h:form id="form">
+				<div class="row"></div>
+				<br />
+				<div class="row">
+					<div class="col-md-12">
+						<div class="form-group ">
+							<div class="col-md-2">
+								<div class="form-group">
+									<p:outputLabel value=" Buscar Cuenta"></p:outputLabel>
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="form-group">
+									<h:inputText value="#{configuracionVentaController.filterByCuenta}"
+										style=" color: #555555; background-image: none;"
+										styleClass="input-sm form-control">
+										<f:ajax />
+									</h:inputText>
+								</div>
+							</div>
+							<div class="col-md-1">
+								<div class="form-group">
+									<p:commandLink id="buttonBuscarCuenta"
+										style="height:25px; width:30px; padding-top: 3px;"
+										styleClass="btn btn-default btn-block">
+										<span class="btn-label"><i class="icon-magnifier"></i></span>
+										<p:ajax update="form001"
+											listener="#{configuracionVentaController.buscarCuentasByFilter()}" />
+									</p:commandLink>
+								</div>
+							</div>
+							<div class="col-md-5"></div>
+						</div>
+					</div>
+
+				</div>
+
+				<div class="row">
+					<div class="col-md-12">
+						<div class="form-group ">
+							<div class="col-md-12">
+								<div class="form-group ">
+									<ui:fragment
+										rendered="#{ configuracionVentaController.mostrarTableBusqueda}">
+										<p:treeTable id="treeTablePlanCuenta" scrollable="true"
+											value="#{planCuentaController.root}" var="node"
+											selectionMode="single" scrollHeight="250" scrollWidth="100%"
+											emptyMessage="No se encontraron Cuentas."
+											selection="#{configuracionVentaController.selectedNodeCuenta}"
+											style="font-size: 12px !important; line-height: 1.33846154 !important; font-family: sans-serif !important;">
+											<p:ajax event="select"
+												listener="#{configuracionVentaController.onNodeSelectPlanCuenta}" />
+											<p:column headerText="Código" width="15%">
+												<ui:fragment rendered="#{node.clase == 'CONTROL'}">
+													<h:outputText value="#{node.codigo}" />
+												</ui:fragment>
+												<ui:fragment rendered="#{node.clase != 'CONTROL'}">
+													<h:outputText value="#{node.codigo}" style="color:#5B9BE1;" />
+												</ui:fragment>
+											</p:column>
+											<p:column headerText="Cuenta">
+												<ui:fragment rendered="#{node.clase == 'CONTROL'}">
+													<h:outputText value="#{node.cuenta}" />
+												</ui:fragment>
+												<ui:fragment rendered="#{node.clase != 'CONTROL'}">
+													<h:outputText value="#{node.cuenta}"
+														style="color:#5B9BE1; " />
+												</ui:fragment>
+											</p:column>
+
+										</p:treeTable>
+									</ui:fragment>
+									<ui:fragment
+										rendered="#{ ! configuracionVentaController.mostrarTableBusqueda}">
+										<p:dataTable id="dataTableQuery" var="item" scrollable="true"
+											widgetVar="queryTable" selectionMode="single"
+											scrollHeight="250" scrollWidth="100%"
+											value="#{configuracionVentaController.listPlanCuenta}"
+											style="font-size: 12px !important; line-height: 1.33846154 !important; font-family: sans-serif !important;"
+											emptyMessage="No se encontraron Cuentas"
+											selection="#{configuracionVentaController.selectedCuentaGeneral}"
+											rowKey="#{item.id}" reflow="true">
+
+											<p:ajax event="rowSelect"
+												listener="#{configuracionVentaController.onRowSelectCuentaGeneral}" />
+
+											<p:column headerText="Código" style="text-align:center;">
+												<h:outputText value="#{item.codigo}"
+													style="text-align:center; color:#5B9BE1;" />
+											</p:column>
+
+											<p:column headerText="Cuenta">
+												<h:outputText value="#{item.descripcion}"
+													style="text-align:center; color:#5B9BE1;" />
+											</p:column>
+
+											<p:column headerText="Moneda">
+												<h:outputText value="#{item.monedaEmpresa.moneda.nombre}"
+													style="text-align:center; color:#5B9BE1;" />
+											</p:column>
+
+										</p:dataTable>
+									</ui:fragment>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<br />
+				<div class="row">
+					<div class="col-md-8"></div>
+					<div class="col-md-2">
+						<div class="form-group">
+							<p:commandLink id="buttonOcultarPlanCuenta" value="&#160; Atras"
+								styleClass="btn btn-warning ion-minus-circled btn-block"
+								style="height:31px; padding:center"
+								onclick="PF('dlgPlanCuenta').hide()">
+							</p:commandLink>
+						</div>
+					</div>
+					<div class="col-md-2">
+						<p:commandLink id="buttonAceptar" value="&#160; Aceptar"
+							onclick="PF('dlgPlanCuenta').hide();" style="height:31px;"
+							styleClass="btn btn-primary ion-checkmark btn-block">
+							<p:ajax update="form001"
+								listener="#{planCuentaController.cancelarBusqueda()}" />
+						</p:commandLink>
+					</div>
+				</div>
+			</h:form>
+		</p:dialog>
+		<!-- END DIALOG -->
+
+	</ui:define>
+
+</ui:composition>

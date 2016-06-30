@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+	template="/WEB-INF/templates/template_main.xhtml">
+
+	<ui:define name="head">
+		<title>Bienvenido al Sistema</title>
+		<title>Inicio</title>
+		<script language="javascript">
+			window.onload = function() {
+				#{tipoCambioController.verificarRegisterTipoCambioDiario()}
+			}
+		</script>
+	</ui:define>
+
+	<ui:define name="content">
+		<!--BEGIN CONTENT-->
+		<div class="content">
+
+			<section class="content-header">
+				<h1 class="pull-left">
+					Dashboard<small>Resumen de actividad.</small>
+				</h1>
+				<div class="pull-right">
+					<ol class="breadcrumb">
+						<li><a href="#{request.contextPath}/pages/dashboard.xhtml"
+							style="color: #0090FF; font-size: 12px;">Inicio</a></li>
+						<!--                         <li><a href="#">Dashboard</a></li> -->
+						<li class="active">Dashboard</li>
+					</ol>
+				</div>
+			</section>
+
+			<section class="main-content">
+				<section class="main-content">
+
+					<br /> <br />
+
+					<div style="background: white;">
+						<div class="row">
+
+							<div class="col-lg-12 text-center v-center">
+								<h:graphicImage styleClass="pulse" name="logo-spaps.jpg" library="gfx"
+									width="320px;" />
+								<h1 style="color: #F77B16; font-family: sans-serif;">Bienvenido
+									al Sistema</h1>
+
+							</div>
+						</div>
+					</div>
+				</section>
+			</section>
+
+		</div>
+
+		<!--END CONTENT-->
+
+		<!-- START GROWL -->
+		<h:form id="formGrowl">
+			<p:growl id="msgs1" showDetail="true" />
+		</h:form>
+		<!-- END GROWL -->
+
+		<!-- INIT MODAL -->
+		<div id="m-r-1" tabindex="-1" role="dialog"
+			aria-labelledby="myModalLabel" aria-hidden="true" class="modal fade">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<h:form id="formModalTipoCambio">
+						<div class="modal-header">
+							<!-- INIT HEADER -->
+							<ui:fragment rendered="false">
+								<!-- false hide button close  -->
+								<button type="button" data-dismiss="modal" class="close">
+									<span aria-hidden="true">x</span><span class="sr-only">Cerrar</span>
+								</button>
+							</ui:fragment>
+							<h4 id="myModalLabel" class="modal-title">Agregar Tipo de
+								Cambio</h4>
+							<!-- END HEADER -->
+						</div>
+						<div class="modal-body">
+							<!-- INIT BODY -->
+							<div class="row">
+								<div class="row">
+									<div class="col-md-12">
+										<p:dataTable id="dataTableTipoCambio" scrollable="true"
+											scrollHeight="115"
+											value="#{tipoCambioController.listEDFechaTipoCambio}"
+											var="item"
+											style="padding-left: 5px !important; padding-right: 5px !important; font-size: 12px !important; line-height: 1.33846154 !important; font-family: sans-serif !important;"
+											rowKey="#{item.fecha}"  editable="true"
+											editMode="cell">
+											<p:ajax event="cellEdit"
+												listener="#{tipoCambioController.onCellEdit}" />
+											<p:column headerText="Fecha" width="20%"
+												style="text-align:center;">
+												<h:outputText value="#{item.fecha}">
+													<f:convertDateTime pattern="dd/MM/yyyy" />
+												</h:outputText>
+											</p:column>
+											<p:column width="40%" headerText="Tipo Cambio"
+												style="text-align:center;">
+												<p:cellEditor>
+													<f:facet name="output">
+														<h:outputText value="#{item.tipoCambio}" />
+													</f:facet>
+													<f:facet name="input">
+														<h:inputText value="#{item.tipoCambio}" style="width:100%" />
+													</f:facet>
+												</p:cellEditor>
+											</p:column>
+											<p:column width="40%" headerText="Ufv"
+												style="text-align:center;">
+												<p:cellEditor>
+													<f:facet name="output">
+														<h:outputText value="#{item.tipoCambioUFV}" />
+													</f:facet>
+													<f:facet name="input">
+														<h:inputText value="#{item.tipoCambioUFV}"
+															style="width:100%" />
+													</f:facet>
+												</p:cellEditor>
+											</p:column>
+										</p:dataTable>
+									</div>
+								</div>
+							</div>
+							<!-- END BODY -->
+						</div>
+						<div class="modal-footer">
+							<!-- INIT FOOTER -->
+							<div class="row">
+								<div class="col-md-4"></div>
+								<div class="col-md-4"></div>
+								<div class="col-md-4">
+									<p:commandLink value="Aceptar"
+										styleClass="btn btn-primary btn-block">
+										<p:ajax update="growl" listener="#{tipoCambioController.registrar()}"/>
+									</p:commandLink>
+								</div>
+							</div>
+							<!-- END FOOTER -->
+						</div>
+					</h:form>
+				</div>
+			</div>
+		</div>
+
+		<!-- END MODAL -->
+
+	</ui:define>
+</ui:composition>

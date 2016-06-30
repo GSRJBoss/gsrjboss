@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:mj="http://mojarra.dev.java.net/mojarra_ext"
+	template="/WEB-INF/templates/template_main.xhtml">
+	<ui:define name="head">
+		<title>NotaVentacion</title>
+	</ui:define>
+
+	<ui:define name="content">
+		<!--BEGIN CONTENT-->
+		<div class="content">
+			<section class="content-header">
+				<div class="pull-left" style="padding-top: 8px;">
+					<h:form id="formBotonesHeader" style="padding-left: 10px;">
+						<div class="btn-group-demo">
+							<div class="btn-group">
+								<p:commandLink id="buttonCrear1" value="&#160; Nueva Nota Venta"
+									styleClass="btn btn-success ion-plus-round"
+									rendered="#{notaVetaListaController.crear}"
+									style="height:31px;"
+									onclick="location.href='#{request.contextPath}/pages/venta/nota_venta.xhtml'">
+								</p:commandLink>
+								<p:commandLink id="buttonCancelar" value="&#160; Cancelar"
+									styleClass="btn btn-warning ion-minus-circled"
+									rendered="#{notaVetaListaController.seleccionarNotaVenta}"
+									style="height:31px; padding:center"
+									update="formBotonesHeader,formTableNotaVentas,:formDatosNotaVenta"
+									action="#{notaVetaListaController.actualizarFormReg()}">
+								</p:commandLink>
+
+								<p:commandLink id="buttonAnular" value="&#160; Anular"
+									styleClass="btn orange ion-alert"
+									rendered="#{notaVetaListaController.seleccionarNotaVenta  and notaVetaListaController.selectedNotaVenta.estado=='V'}"
+									style="height:31px; padding:center"
+									update="formBotonesHeader,formTableNotaVentas,:formDatosNotaVenta"
+									action="#{notaVetaListaController.anularNotaVenta()}">
+								</p:commandLink>
+								<p:commandLink id="buttonModificar" value="&#160; Imprimir"
+									styleClass="btn btn-info ion-printer"
+									rendered="#{notaVetaListaController.seleccionarNotaVenta and notaVetaListaController.selectedNotaVenta.estado=='V' or notaVetaListaController.selectedNotaVenta.estado=='AC'}"
+									style="height:31px;" update=":formModalVistaPrevia"
+									action="#{notaVetaListaController.armarUrl()}"
+									oncomplete="PF('dlgNotaVentaVistaPrevia').show();">
+								</p:commandLink>
+								<p:commandLink id="buttonFacturar" value="&#160; Facturar"
+									styleClass="btn btn-info ion-printer"
+									rendered="#{notaVetaListaController.seleccionarNotaVenta and (notaVetaListaController.selectedNotaVenta.estado=='V' or notaVetaListaController.selectedNotaVenta.estado=='AC') and notaVetaListaController.selectedNotaVenta.factura.id==null}"
+									style="height:31px;" update=":formModalFactura"
+									action="#{notaVetaListaController.crearFactura()}"
+									oncomplete="PF('dlgFactura').show();">
+								</p:commandLink>
+
+							</div>
+						</div>
+					</h:form>
+				</div>
+				<div class="pull-right">
+					<ol class="breadcrumb">
+						<li><a href="#{request.contextPath}/pages/dashboard.jsf"
+							style="color: #0090FF; font-size: 12px;">Inicio</a></li>
+						<li><a
+							href="#{request.contextPath}/pages/reportes/nota_venta_lista.xhtml"
+							style="color: #0090FF; font-size: 12px;">Parametrización</a></li>
+						<li class="active" style="font-size: 12px;">Nota Ventas</li>
+					</ol>
+				</div>
+			</section>
+			<section class="main-content">
+				<section class="main-content">
+					<div class="row">
+						<h:form id="formDatosNotaVenta">				`
+						
+							
+
+							
+						</h:form>
+					</div>
+
+					<div class="row">
+						<h:form id="formTableNotaVentas">
+							<div class="col-md-12">
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<h3 class="panel-title">Lista de NotaVentas</h3>
+										<p:commandLink target="_blank" ajax="false">
+											<p:graphicImage library="gfx" name="pdf.png" height="30"
+												width="30" />
+											<p:fileDownload
+												value="#{notaVetaListaController.streamedUrlPdf}" />
+										</p:commandLink>
+
+										<p:commandLink target="_blank" ajax="false">
+											<p:graphicImage library="gfx" name="excel.png" height="30"
+												width="30" />
+											<p:fileDownload
+												value="#{notaVetaListaController.streamedUrlExcel}" />
+										</p:commandLink>
+										<h:panelGrid columns="5">
+											<h:outputText value="Desde:" />
+											<p:calendar value="#{notaVetaListaController.fechaInicio}"
+												pattern="dd/MM/yyyy"></p:calendar>
+											<h:outputText value="Hasta:" />
+											<p:calendar value="#{notaVetaListaController.fechaFin}"
+												pattern="dd/MM/yyyy"></p:calendar>
+											<p:commandLink id="buttonBuscarID" value="&#160; Consultar"
+												styleClass="btn orange ion-search"
+												style="height:31px; padding:center"
+												update=":formBotonesHeader,:formTableNotaVentas"
+												action="#{notaVetaListaController.consultar()}">
+											</p:commandLink>
+										</h:panelGrid>
+
+
+									</div>
+									<!-- start here datatable -->
+									<div class="form-group">
+										<p:dataTable id="dataTableNotaVenta" var="item"
+											rendered="true"
+											value="#{notaVetaListaController.listNotaVenta}"
+											reflow="true" emptyMessage="No se encontraron notaVenta"
+											selectionMode="single" rowIndexVar="index"
+											style="font-size: 12px !important; line-height: 1.33846154 !important; font-family: sans-serif !important;"
+											paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+											rowsPerPageTemplate="10 20 30 40 50" first="0"
+											paginator="true" rows="10"
+											selection="#{notaVetaListaController.selectedNotaVenta}"
+											rowKey="#{item.id}">
+											<p:ajax event="rowSelect"
+												update=":formBotonesHeader,:formDatosNotaVenta,:formTableNotaVentas"
+												listener="#{notaVetaListaController.onRowSelect}" />
+
+											<f:facet name="header">V=FACTURA VALIDA, A=FACTURA ANULADA</f:facet>
+											<p:column headerText="Nº" width="4%"
+												style="text-align:center;">
+												<h:outputText value="#{index+1}" />
+											</p:column>
+
+											<p:column headerText="Nº NotaVenta" filterBy="#{item.id}"
+												filterMatchMode="exact"
+												filterStyle="width: 100%; height:25px;" width="7%"
+												style="text-align:center;">
+												<center>
+													<span class="label label-warning"> <h:outputText
+															value="#{item.id}" />
+													</span>
+												</center>
+											</p:column>
+											<p:column headerText="Fecha" width="8%"
+												style="text-align:center;">
+												<p:calendar value="#{item.fechaRegistro}"
+													style="text-align:right;" pattern="dd/MM/yyyy" />
+											</p:column>
+
+											<p:column headerText="Razon Social"
+												filterBy="#{item.nombreFactura}" width="20%"
+												filterMatchMode="contains"
+												filterStyle="width: 100%; height:25px;">
+												<h:outputText value="#{item.nombreFactura}" />
+											</p:column>
+
+											<p:column headerText="Total Venta" width="10%"
+												filterBy="#{item.totalPagar}" filterMatchMode="contains"
+												style="text-align: right;"
+												filterStyle="width: 100%; height:25px;">
+												<h:outputText value="#{item.totalPagar}">
+													<f:convertNumber pattern="#,##0.00" />
+												</h:outputText>
+											</p:column>
+											<p:column headerText="Estado" filterBy="#{item.estado}"
+												width="5%" filterMatchMode="contains"
+												filterStyle="width: 100%; height:25px;">
+												<center>
+													<h:outputText value="#{item.estado}" />
+												</center>
+											</p:column>
+											<p:column headerText="Facturado?"
+												filterBy="#{item.factura.id}" width="5%"
+												filterMatchMode="contains"
+												filterStyle="width: 100%; height:25px;">
+												<span class="label label-success"><h:outputText
+														rendered="#{item.factura.id==null}" value="Sin Factura" /></span>
+												<span class="label label-primary"><h:outputText
+														rendered="#{item.factura.id!=null}" value="Facturado" /></span>
+											</p:column>
+										</p:dataTable>
+									</div>
+
+								</div>
+							</div>
+
+							<ui:fragment rendered="#{  notaVetaListaController.verReporte}">
+								<div class="row">
+									<div class="col-md-12">
+										<div class="panel panel-default">
+											<div class="panel-heading">
+												<h3 class="panel-title">Reporte</h3>
+											</div>
+											<div class="panel-body">
+												<div class="tabbable-custom">
+													<ul class="nav nav-tabs">
+														<li class="active"><a href="#tab_5_1"
+															data-toggle="tab">REPORTE FACTURA</a></li>
+														<li><a href="#tab_5_2" data-toggle="tab">REPORTE
+																FICHA ORDEN</a></li>
+													</ul>
+													<div class="tab-content">
+														<div id="tab_5_1" class="tab-pane active">
+															<div class="row">
+																<p:media player="pdf" rendered="true"
+																	value="#{notaVetaListaController.url}" width="800px"
+																	height="1125px" />
+															</div>
+														</div>
+														<div id="tab_5_2" class="tab-pane ">
+															<div class="row">
+																<p:media player="pdf" rendered="true"
+																	value="#{notaVetaListaController.urlFicha}"
+																	width="800px" height="1125px" />
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</ui:fragment>
+
+						</h:form>
+					</div>
+
+				</section>
+				<h:form id="form002">
+					<div class="row">
+						<iframe src="#{notaVetaListaController.fileTempPrintFact}"
+							width="0px;" height="0px;" id="PDFtoPrint"> </iframe>
+					</div>
+				</h:form>
+			</section>
+		</div>
+		<!--END CONTENT-->
+
+		<!-- START GROWL :formGrowl:msgs1 -->
+		<h:form id="formGrowl">
+			<p:growl id="msgs1" showDetail="true" />
+		</h:form>
+		<!-- END GROWL -->
+
+
+
+
+
+
+		<!-- VISTA PREVIA REPORTE -->
+		<p:dialog showEffect="explode" header="Vista Previa"
+			widgetVar="dlgNotaVentaVistaPrevia" resizable="false" modal="true"
+			position="center" width="750" styleClass="customDialog"
+			visible="#{not empty facesContext.maximumSeverity}"
+			id="modalVistaPrevia">
+			<h:form id="formModalVistaPrevia">
+				<div class="row">
+					<div class="form-group ">
+						<div class="col-md-12">
+							<p:media player="pdf" rendered="true"
+								value="#{notaVetaListaController.url}" width="750px"
+								height="480px" />
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-12">
+						<div class="form-group">
+							<div class="col-md-4"></div>
+							<div class="col-md-4"></div>
+							<div class="col-md-4">
+								<p:commandLink value="Cerrar"
+									styleClass="btn btn-primary btn-block"
+									action="#{notaVetaListaController.dialogClose()}" />
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</h:form>
+		</p:dialog>
+
+
+
+		<!--  FACTURAR -->
+		<p:dialog showEffect="explode" header="Factura" widgetVar="dlgFactura"
+			resizable="false" position="center" width="40%"
+			styleClass="customDialog" id="modalVistaPreviaFactura"
+			visible="#{not empty facesContext.maximumSeverity}">
+			<h:form id="formModalFactura">
+				<div class="row">
+					<div class="col-md-12">
+						<div class="form-group ">
+							<div class="col-md-3">Nit</div>
+							<div class="col-md-9">
+								<p:autoComplete id="dlgAutoCompleteNit" style="width: 100%"
+									inputStyle="width: 100%; color: #555555; background-image: none; font-size: 15pt;"
+									value="#{notaVetaListaController.textoAutoCompleteNit}"
+									completeMethod="#{notaVetaListaController.completeClienteNit}"
+									maxResults="10" placeholder="Nit Cliente">
+									<p:ajax event="change" />
+									<p:ajax event="itemSelect"
+										update="formModalFactura,dlgNombreClienteID"
+										listener="#{notaVetaListaController.onRowSelectClienteNitClick}" />
+								</p:autoComplete>
+							</div>
+						</div>
+						<div class="form-group ">
+							<div class="col-md-3">Nombre</div>
+							<div class="col-md-9">
+								<p:autoComplete id="dlgNombreClienteID" style="width: 100%"
+									inputStyle="width: 100%; color: #555555; background-image: none; font-size: 15pt;"
+									value="#{notaVetaListaController.textoAutoCompleteCliente}"
+									completeMethod="#{notaVetaListaController.completeClienteNombre}"
+									maxResults="10" placeholder="Nombre Cliente">
+									<p:ajax event="change" />
+									<p:ajax event="itemSelect"
+										update="formModalFactura,dlgAutoCompleteNit"
+										listener="#{notaVetaListaController.onRowSelectClienteNombreClick}" />
+								</p:autoComplete>
+							</div>
+						</div>
+					</div>
+				</div>
+				<hr />
+				<div class="row">
+					<div class="col-md-12">
+						<div class="form-group ">
+							<div class="col-md-3">Valor a Pagar</div>
+							<div class="col-md-9">
+								<h:inputText id="dlgTotalID"
+									value="#{notaVetaListaController.totalImporte}"
+									style=" color: #555555; background-image: none; font-size: 15pt;"
+									styleClass="input-lg form-control" readonly="true">
+									<f:convertNumber type="number" groupingUsed="true"
+										minFractionDigits="2" pattern="#0.00" />
+								</h:inputText>
+							</div>
+						</div>
+						<br />
+						<div class="form-group ">
+							<div class="col-md-3">Efectivo</div>
+							<div class="col-md-9">
+								<h:inputText id="dlgEfectivoID"
+									value="#{notaVetaListaController.efectivoBolivianos}"
+									style=" color: #555555; background-image: none; font-size: 15pt;"
+									styleClass="input-lg form-control" autocomplete="off">
+									<f:convertNumber type="number" groupingUsed="true"
+										minFractionDigits="2" pattern="#0.00" />
+									<p:ajax event="keyup" update="dlgCambioID"
+										listener="#{notaVetaListaController.calcularCambio()}" />
+								</h:inputText>
+							</div>
+						</div>
+						<br />
+						<div class="form-group ">
+							<div class="col-md-3">Cambio</div>
+							<div class="col-md-9">
+								<h:inputText id="dlgCambioID"
+									value="#{notaVetaListaController.totalCambio}"
+									style=" color: #555555; background-image: none; font-size: 15pt;"
+									styleClass="input-lg form-control" readonly="true">
+									<f:convertNumber type="number" groupingUsed="true"
+										minFractionDigits="2" pattern="#0.00" />
+								</h:inputText>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="form-group "></div>
+					</div>
+				</div>
+				<div class="row"></div>
+				<div class="row">
+					<div class="col-md-12">
+						<div class="form-group">
+							<div class="col-md-4"></div>
+							<div class="col-md-4">
+								<p:commandLink id="buttonCancelar" value="&#160; Cancelar"
+									styleClass="btn btn-warning btn-block"
+									onclick="PF('dlgFactura').hide();">
+								</p:commandLink>
+							</div>
+							<div class="col-md-4">
+								<p:commandLink value="Aceptar"
+									styleClass="btn btn-primary btn-block">
+									<p:ajax update="formBotonesHeader,formTableNotaVentas,formGrowl:msgs1"
+										listener="#{notaVetaListaController.registrarEImprimir()}" />
+								</p:commandLink>
+							</div>
+						</div>
+					</div>
+				</div>
+			</h:form>
+		</p:dialog>
+
+
+	</ui:define>
+
+</ui:composition>

@@ -1,0 +1,544 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+	template="/WEB-INF/templates/template_main.xhtml">
+
+	<ui:define name="head">
+		<title>Tipo Cliente</title>
+		<f:event listener="#{tipoClienteController.initConversation}"
+			type="preRenderView"></f:event>
+	</ui:define>
+
+	<ui:define name="content">
+		<!--BEGIN CONTENT-->
+		<div class="content">
+			<section class="main-content"
+				style="background-color: #f5f6f6; padding-top: 0px;">
+				<h:form id="form001">
+					<!-- BEGIN BUTTONS -->
+					<div class="row" style="background-color: #f9fafa;">
+						<section class="content-header">
+							<div class="pull-left"
+								style="padding-top: 8px; padding-left: 15px;">
+								<div class="btn-group-demo">
+									<div class="btn-group">
+										<p:commandLink id="buttonCancelar" value="&#160; Cancelar"
+											styleClass="btn btn-warning ion-minus-circled"
+											style="height:31px; padding:center" immediate="true"
+											rendered="#{tipoClienteController.modificar or tipoClienteController.registrar}"
+											update="form001"
+											action="#{tipoClienteController.loadDefault()}">
+										</p:commandLink>
+
+										<p:commandLink id="buttonCrear1"
+											value="&#160; Nuevo Tipo Cliente"
+											styleClass="btn btn-success ion-plus-round"
+											rendered="#{tipoClienteController.crear }"
+											style="height:31px;" update="form001"
+											action="#{tipoClienteController.actionNuevo()}">
+										</p:commandLink>
+
+										<p:commandLink id="buttonRegistrar" value="&#160; Registrar"
+											styleClass="btn btn-success ion-checkmark"
+											rendered="#{tipoClienteController.registrar}"
+											style="height:31px;" update="form001"
+											action="#{tipoClienteController.registrarTipoProveedor()}">
+										</p:commandLink>
+
+										<p:commandLink id="buttonModificar" value="&#160; Modificar"
+											rendered="#{tipoClienteController.modificar }"
+											styleClass="btn btn-primary ion-edit" style="height:31px;"
+											update="form001"
+											action="#{tipoClienteController.modificarTipoProveedor()}">
+										</p:commandLink>
+
+										<p:commandLink id="buttonEliminar" value="&#160; Eliminar"
+											styleClass="btn btn-danger ion-trash-b" style="height:31px;"
+											rendered="#{tipoClienteController.modificar }"
+											disabled="#{newUsuario.state.equals('SU')}" update="form001"
+											action="#{tipoClienteController.eliminarTipoProveedor()}">
+										</p:commandLink>
+									</div>
+								</div>
+							</div>
+							<div class="pull-right">
+								<ol class="breadcrumb">
+									<li><a href="#{request.contextPath}/index"
+										style="color: #0090FF; font-size: 12px;">Inicio</a></li>
+									<li><a href="#{request.contextPath}/user"
+										style="color: #0090FF; font-size: 12px;">Venta</a></li>
+									<li class="active" style="font-size: 12px;">Tipo Cliente</li>
+								</ol>
+							</div>
+						</section>
+					</div>
+					<!-- END BUTTONS -->
+
+					<!-- BEGIN PANEL REGISTER -->
+					<div class="row" style="padding-top: 10px;">
+						<ui:fragment
+							rendered="#{tipoClienteController.modificar or tipoClienteController.registrar}">
+							<div class="col-md-4">
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<h3 class="panel-title">Datos Tipo Cliente</h3>
+									</div>
+									<div class="panel-body">
+										<div class="box-content form-horizontal">
+											<div class="form-group ">
+												<div class="col-md-3">Nombre</div>
+												<div class="col-md-9">
+													<h:inputText id="inputTextNombre"
+														value="#{tipoClienteController.newTipoCliente.nombre}"
+														style=" color: #555555; background-image: none;"
+														styleClass="input-sm form-control" required="true"
+														requiredMessage="Nombre Requerido">
+														<p:ajax event="change" />
+													</h:inputText>
+												</div>
+											</div>
+											<div class="form-group ">
+												<div class="col-md-3">Descripción</div>
+												<div class="col-md-9">
+													<h:inputText id="inputTextDescripcion"
+														value="#{tipoClienteController.newTipoCliente.descripcion}"
+														style=" color: #555555; background-image: none;"
+														styleClass="input-sm form-control" required="true"
+														requiredMessage="Descripción Requerido">
+														<p:ajax event="change" />
+													</h:inputText>
+												</div>
+											</div>
+											<div class="form-group">
+												<div class="col-md-3">Cuenta por Cobrar</div>
+												<div class="col-md-7">
+													<p:autoComplete id="cuentaPorPagar" style="width: 100%"
+														inputStyle="width: 100%; color: #555555; background-image: none; padding: 5px 10px;"
+														value="#{tipoClienteController.selectedCuentaCobrar.descripcion}"
+														completeMethod="#{tipoClienteController.completeCuentaAuxiliar}"
+														minQueryLength="2" required="true"
+														requiredMessage="Cuenta por Pagar Requerido."
+														forceSelection="true" var="_var" itemLabel="#{_var}"
+														itemValue="#{_var.descripcion}" placeholder="Cuenta"
+														maxResults="10">
+
+														<p:ajax event="itemSelect" update="cuentaPorPagar"
+															listener="#{tipoClienteController.onRowSelectCuentaCobrarAuxiliarClick}" />
+
+														<p:column>
+															<h:outputText value="#{_var.codigo}" />
+														</p:column>
+
+														<p:column>
+															<h:outputText value="#{_var.descripcion}" />
+														</p:column>
+
+													</p:autoComplete>
+												</div>
+												<div class="col-md-2">
+													<p:commandLink id="buttonDlgCuenta" immediate="true"
+														styleClass="btn btn-default ion-document-text"
+														style="height:27px; width: 31px;">
+														<p:ajax
+															listener="#{tipoClienteController.loadDialogCuenta()}" />
+													</p:commandLink>
+
+												</div>
+											</div>
+											<div class="form-group">
+												<div class="col-md-3">Documento por Cobrar</div>
+												<div class="col-md-7">
+													<p:autoComplete id="documentoPorPagar" style="width: 100%"
+														inputStyle="width: 100%; color: #555555; background-image: none; padding: 5px 10px;"
+														value="#{tipoClienteController.selectedCuentaDocumentoCobrar.descripcion}"
+														completeMethod="#{tipoClienteController.completeCuentaAuxiliar}"
+														minQueryLength="2" required="true"
+														requiredMessage="Documento por Pagar Requerido."
+														forceSelection="true" var="_var" itemLabel="#{_var}"
+														itemValue="#{_var.descripcion}" placeholder="Cuenta"
+														maxResults="10">
+
+														<p:ajax event="itemSelect" update="documentoPorPagar"
+															listener="#{tipoClienteController.onRowSelectDocumentoCobrarAuxiliarClick}" />
+
+														<p:column>
+															<h:outputText value="#{_var.codigo}" />
+														</p:column>
+
+														<p:column>
+															<h:outputText value="#{_var.descripcion}" />
+														</p:column>
+
+													</p:autoComplete>
+												</div>
+												<div class="col-md-2">
+													<p:commandLink id="buttonDlgCuenta2" immediate="true"
+														styleClass="btn btn-default ion-document-text"
+														style="height:27px; width: 31px;">
+														<p:ajax
+															listener="#{tipoClienteController.loadDialogCuenta()}" />
+													</p:commandLink>
+
+												</div>
+											</div>
+											
+											<div class="form-group">
+												<div class="col-md-3">Anticipo sobre Venta</div>
+												<div class="col-md-7">
+													<p:autoComplete id="anticipoSobreVenta" style="width: 100%"
+														inputStyle="width: 100%; color: #555555; background-image: none; padding: 5px 10px;"
+														value="#{tipoClienteController.selectedCuentaAnticipoPorVenta.descripcion}"
+														completeMethod="#{tipoClienteController.completeCuentaAuxiliar}"
+														minQueryLength="2" required="true"
+														requiredMessage="Documento por Pagar Requerido."
+														forceSelection="true" var="_var" itemLabel="#{_var}"
+														itemValue="#{_var.descripcion}" placeholder="Cuenta"
+														maxResults="10">
+
+														<p:ajax event="itemSelect" update="anticipoSobreVenta"
+															listener="#{tipoClienteController.onRowSelectCuentaAnticipoAuxiliarClick}" />
+
+														<p:column>
+															<h:outputText value="#{_var.codigo}" />
+														</p:column>
+
+														<p:column>
+															<h:outputText value="#{_var.descripcion}" />
+														</p:column>
+
+													</p:autoComplete>
+												</div>
+												<div class="col-md-2">
+													<p:commandLink  immediate="true"
+														styleClass="btn btn-default ion-document-text"
+														style="height:27px; width: 31px;">
+														<p:ajax
+															listener="#{tipoClienteController.loadDialogCuenta()}" />
+													</p:commandLink>
+
+												</div>
+											</div>
+											
+											<div class="form-group">
+												<div class="col-md-3">Cuenta Devolución</div>
+												<div class="col-md-7">
+													<p:autoComplete id="cuentaDevolucion" style="width: 100%"
+														inputStyle="width: 100%; color: #555555; background-image: none; padding: 5px 10px;"
+														value="#{tipoClienteController.selectedCuentaDevolucion.descripcion}"
+														completeMethod="#{tipoClienteController.completeCuentaAuxiliar}"
+														minQueryLength="2" required="true"
+														requiredMessage="Documento por Pagar Requerido."
+														forceSelection="true" var="_var" itemLabel="#{_var}"
+														itemValue="#{_var.descripcion}" placeholder="Cuenta"
+														maxResults="10">
+
+														<p:ajax event="itemSelect" update="cuentaDevolucion"
+															listener="#{tipoClienteController.onRowSelectCuentaDevolucionAuxiliarClick}" />
+
+														<p:column>
+															<h:outputText value="#{_var.codigo}" />
+														</p:column>
+
+														<p:column>
+															<h:outputText value="#{_var.descripcion}" />
+														</p:column>
+
+													</p:autoComplete>
+												</div>
+												<div class="col-md-2">
+													<p:commandLink  immediate="true"
+														styleClass="btn btn-default ion-document-text"
+														style="height:27px; width: 31px;">
+														<p:ajax
+															listener="#{tipoClienteController.loadDialogCuenta()}" />
+													</p:commandLink>
+
+												</div>
+											</div>
+											
+											<div class="form-group">
+												<label class="col-md-3">Moneda</label>
+												<div class="col-md-9">
+													<h:selectOneMenu id="monedaEmpresa"
+														styleClass="input-sm form-control"
+														style=" color: #555555; height:25px; font-size:11px;"
+														immediate="true" required="true"
+														requiredMessage="Moneda Requerido"
+														value="#{tipoClienteController.selectedMonedaEmpresa.id}">
+														<p:ajax event="change" />
+														<f:selectItems itemLabel="#{item.moneda.nombre}"
+															var="item" itemValue="#{item.id}"
+															value="#{tipoClienteController.listMonedaEmpresa}" />
+													</h:selectOneMenu>
+												</div>
+											</div>
+											<div class="form-group">
+												<label class="col-md-3">Estado</label>
+												<div class="col-md-9">
+													<h:selectOneMenu id="estado"
+														styleClass="input-sm form-control"
+														style=" color: #555555; height:25px; font-size:11px;"
+														immediate="true" required="true"
+														requiredMessage="Estado Requerido"
+														value="#{tipoClienteController.newTipoCliente.estado}">
+														<f:ajax />
+														<f:selectItem itemValue="AC" itemLabel="ACTIVO" />
+														<f:selectItem itemValue="IN" itemLabel="INACTIVO" />
+													</h:selectOneMenu>
+												</div>
+											</div>
+
+										</div>
+									</div>
+								</div>
+							</div>
+						</ui:fragment>
+					</div>
+					<!-- END PANEL REGISTER -->
+
+					<!-- BEGIN PANEL TABLE -->
+					<div class="row">
+						<ui:fragment rendered="#{tipoClienteController.crear}">
+							<div class="col-md-12">
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<h3 class="panel-title">Lista Tipo Cliente</h3>
+									</div>
+									<div class="form-group">
+										<p:dataTable id="dataTableUser" var="item" rendered="true"
+											value="#{tipoClienteController.listTipoCliente}"
+											reflow="true"
+											style="font-size: 12px !important; line-height: 1.33846154 !important; font-family: sans-serif !important;"
+											selectionMode="single"
+											selection="#{tipoClienteController.selectedTipoCliente}"
+											rowKey="#{item.id}"
+											emptyMessage="No se encontraron registros" rows="20"
+											paginator="true" paginatorPosition="top">
+											<p:ajax event="rowSelect"
+												listener="#{tipoClienteController.onRowSelect}"
+												update="form001" />
+											<p:column headerText="Id" width="8%" rendered="false"
+												style="text-align:center;" filterMatchMode="contains"
+												filterStyle="width: 100%; height:25px;"
+												filterBy="#{item.id}">
+												<h:outputText value="#{item.id}" />
+											</p:column>
+											<p:column headerText="Nombre" width="12%"
+												filterStyle="width: 100%; height:25px;"
+												filterMatchMode="contains" filterBy="#{item.nombre}">
+												<h:outputText value="#{item.nombre}" />
+											</p:column>
+											<p:column headerText="Descripción" width="30%"
+												filterStyle="width: 100%; height:25px;"
+												filterMatchMode="contains" filterBy="#{item.descripcion}">
+												<h:outputText value="#{item.descripcion}" />
+											</p:column>
+											<p:column headerText="Cuenta Por Cobrar" width="15%"
+												filterStyle="width: 100%; height:25px;"
+												filterMatchMode="contains" filterBy="#{item.cuentaCobrar}">
+												<h:outputText value="#{item.cuentaCobrar}" />
+											</p:column>
+											<p:column headerText="Documento Por Cobrar" width="15%"
+												filterStyle="width: 100%; height:25px;"
+												filterMatchMode="contains"
+												filterBy="#{item.cuentaDocumentoCobrar}">
+												<h:outputText value="#{item.cuentaDocumentoCobrar}" />
+											</p:column>
+											<p:column headerText="Moneda" width="15%"
+												filterStyle="width: 100%; height:25px;"
+												filterMatchMode="contains" filterBy="#{item.monedaEmpresa}">
+												<h:outputText value="#{item.monedaEmpresa}" />
+											</p:column>
+											<p:column width="9%" headerText="Estado"
+												filterStyle="width: 100%; height:25px;"
+												style="text-align:center;" filterBy="#{item.estado}">
+												<span class="label label-success"><h:outputText
+														rendered="#{item.estado=='AC'}" value="Activo" /></span>
+												<span class="label label-danger"><h:outputText
+														rendered="#{item.estado=='IN'}" value="Inactivo" /></span>
+												<span class="label label-success"><h:outputText
+														rendered="#{item.estado=='SU'}" value="SUPER" /></span>
+											</p:column>
+											<p:column width="9%" headerText="Registro"
+												filterStyle="width: 100%; height:25px;"
+												style="text-align:center;"
+												filterBy="#{item.usuarioRegistro}">
+												<h:outputText value="#{item.usuarioRegistro}">
+												</h:outputText>
+											</p:column>
+											<p:column width="8%" headerText="Fecha "
+												filterStyle="width: 100%; height:25px;"
+												style="text-align:center;" filterBy="#{item.fechaRegistro}">
+												<h:outputText value="#{item.fechaRegistro}">
+													<f:convertDateTime pattern="dd/MM/yyyy" />
+												</h:outputText>
+											</p:column>
+											<f:facet name="footer">
+												<h:outputText
+													value="#{tipoClienteController.listTipoCliente.size()} Registros en Total" />
+											</f:facet>
+										</p:dataTable>
+									</div>
+									<div class="panel-body"></div>
+								</div>
+							</div>
+						</ui:fragment>
+					</div>
+					<!-- END PANEL TABLE -->
+				</h:form>
+			</section>
+		</div>
+		<!--END CONTENT-->
+
+		<!-- START GROWL -->
+		<h:form id="formGrowl">
+			<p:growl id="msgs1" showDetail="true" />
+		</h:form>
+		<!-- END GROWL -->
+
+		<!-- START DIALOG -->
+		<!-- PLAN DE CUENTA -->
+		<p:dialog header="SELECCION PLAN DE CUENTA" widgetVar="dlgPlanCuenta"
+			modal="true" visible="#{not empty facesContext.maximumSeverity}"
+			resizable="false" position="center" width="60%">
+			<h:form id="form">
+				<div class="row"></div>
+				<br />
+				<div class="row">
+					<div class="col-md-12">
+						<div class="form-group ">
+							<div class="col-md-2">
+								<div class="form-group">
+									<p:outputLabel value=" Buscar Cuenta"></p:outputLabel>
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="form-group">
+									<h:inputText value="#{tipoClienteController.filterByCuenta}"
+										style=" color: #555555; background-image: none;"
+										styleClass="input-sm form-control">
+										<f:ajax />
+									</h:inputText>
+								</div>
+							</div>
+							<div class="col-md-1">
+								<div class="form-group">
+									<p:commandLink id="buttonBuscarCuenta"
+										style="height:25px; width:30px; padding-top: 3px;"
+										styleClass="btn btn-default btn-block">
+										<span class="btn-label"><i class="icon-magnifier"></i></span>
+										<p:ajax update="form001"
+											listener="#{tipoClienteController.buscarCuentasByFilter()}" />
+									</p:commandLink>
+								</div>
+							</div>
+							<div class="col-md-5"></div>
+						</div>
+					</div>
+
+				</div>
+
+				<div class="row">
+					<div class="col-md-12">
+						<div class="form-group ">
+							<div class="col-md-12">
+								<div class="form-group ">
+									<ui:fragment
+										rendered="#{ tipoClienteController.mostrarTableBusqueda}">
+										<p:treeTable id="treeTablePlanCuenta" scrollable="true"
+											value="#{planCuentaController.root}" var="node"
+											selectionMode="single" scrollHeight="250" scrollWidth="100%"
+											emptyMessage="No se encontraron Cuentas."
+											selection="#{tipoClienteController.selectedNodeCuenta}"
+											style="font-size: 12px !important; line-height: 1.33846154 !important; font-family: sans-serif !important;">
+											<p:ajax event="select"
+												listener="#{tipoClienteController.onNodeSelectPlanCuenta}" />
+											<p:column headerText="Código" width="15%">
+												<ui:fragment rendered="#{node.clase == 'CONTROL'}">
+													<h:outputText value="#{node.codigo}" />
+												</ui:fragment>
+												<ui:fragment rendered="#{node.clase != 'CONTROL'}">
+													<h:outputText value="#{node.codigo}" style="color:#5B9BE1;" />
+												</ui:fragment>
+											</p:column>
+											<p:column headerText="Cuenta">
+												<ui:fragment rendered="#{node.clase == 'CONTROL'}">
+													<h:outputText value="#{node.cuenta}" />
+												</ui:fragment>
+												<ui:fragment rendered="#{node.clase != 'CONTROL'}">
+													<h:outputText value="#{node.cuenta}"
+														style="color:#5B9BE1; " />
+												</ui:fragment>
+											</p:column>
+
+										</p:treeTable>
+									</ui:fragment>
+									<ui:fragment
+										rendered="#{ ! tipoClienteController.mostrarTableBusqueda}">
+										<p:dataTable id="dataTableQuery" var="item" scrollable="true"
+											widgetVar="queryTable" selectionMode="single"
+											scrollHeight="250" scrollWidth="100%"
+											value="#{tipoClienteController.listPlanCuenta}"
+											style="font-size: 12px !important; line-height: 1.33846154 !important; font-family: sans-serif !important;"
+											emptyMessage="No se encontraron Cuentas"
+											selection="#{tipoClienteController.selectedCuentaGeneral}"
+											rowKey="#{item.id}" reflow="true">
+
+											<p:ajax event="rowSelect"
+												listener="#{tipoClienteController.onRowSelectCuentaGeneral}" />
+
+											<p:column headerText="Código" style="text-align:center;">
+												<h:outputText value="#{item.codigo}"
+													style="text-align:center; color:#5B9BE1;" />
+											</p:column>
+
+											<p:column headerText="Cuenta">
+												<h:outputText value="#{item.descripcion}"
+													style="text-align:center; color:#5B9BE1;" />
+											</p:column>
+
+											<p:column headerText="Moneda">
+												<h:outputText value="#{item.monedaEmpresa.moneda.nombre}"
+													style="text-align:center; color:#5B9BE1;" />
+											</p:column>
+
+										</p:dataTable>
+									</ui:fragment>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<br />
+				<div class="row">
+					<div class="col-md-8"></div>
+					<div class="col-md-2">
+						<div class="form-group">
+							<p:commandLink id="buttonOcultarPlanCuenta" value="&#160; Atras"
+								styleClass="btn btn-warning ion-minus-circled btn-block"
+								style="height:31px; padding:center"
+								onclick="PF('dlgPlanCuenta').hide()">
+							</p:commandLink>
+						</div>
+					</div>
+					<div class="col-md-2">
+						<p:commandLink id="buttonAceptar" value="&#160; Aceptar"
+							onclick="PF('dlgPlanCuenta').hide();" style="height:31px;"
+							styleClass="btn btn-primary ion-checkmark btn-block">
+							<p:ajax update="form001"
+								listener="#{planCuentaController.cancelarBusqueda()}" />
+						</p:commandLink>
+					</div>
+				</div>
+			</h:form>
+		</p:dialog>
+		<!-- END DIALOG -->
+
+	</ui:define>
+
+</ui:composition>

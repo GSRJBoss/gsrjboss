@@ -1,0 +1,543 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+	template="/WEB-INF/templates/template_main.xhtml">
+
+	<ui:define name="head">
+		<title>CAJA</title>
+		<f:event listener="#{cajaController.initConversation}"
+			type="preRenderView"></f:event>
+	</ui:define>
+
+	<ui:define name="content">
+		<!--BEGIN CONTENT-->
+		<div class="content">
+			<section class="main-content"
+				style="background-color: #f5f6f6; padding-top: 0px;">
+				<h:form id="form001">
+					<!-- BEGIN BUTTONS -->
+
+					<div class="row" style="background-color: #f9fafa;"></div>
+					<!-- END BUTTONS -->
+					<ui:fragment rendered="#{!  cajaController.verReporte}">
+						<div class="row" style="padding-top: 10px;">
+							<!-- BEGIN PANEL REGISTER -->
+
+							<div class="col-md-5 "
+								style="min-height: 100% !important; max-height: 1024px !important; height: 100% !important;">
+
+								<div class="panel panel-default">
+									<strong> <span class="alert-warning"><h:outputText
+												lang="es"
+												rendered="#{facturaConceptoController.diasrestantes gt -1 and facturaConceptoController.diasrestantes lt 30}"
+												value="Faltan #{facturaConceptoController.diasrestantes} dias">
+												<f:convertNumber pattern="0######" />
+											</h:outputText></span> <span class="alert-danger"><h:outputText lang="es"
+												rendered="#{facturaController.puedofacturar=='false'}"
+												value="Pasaron #{facturaConceptoController.diasrestantes} dias, Por favor tiene que Dosificar">
+												<f:convertNumber pattern="0######" />
+											</h:outputText></span>
+									</strong>
+									<div class="panel-heading">
+										<h3 class="panel-title">Detalle</h3>
+									</div>
+									<div class="panel-body" style="padding: 10px; height: 750px;">
+										<!-- start here register -->
+										<div class="row">
+											<div class="form-group ">
+												<div class="col-md-5" style="padding-right: 5px;">
+													<h3>TOTAL Bs.</h3>
+												</div>
+												<div class="col-md-7">
+													<h:inputText id="totalID"
+														value="#{cajaController.totalImporte}"
+														style="font-size: 19pt; color: #555555; background-image: none; text-align: center;"
+														styleClass="input-lg form-control" readonly="true">
+														<f:convertNumber type="number" groupingUsed="true"
+															minFractionDigits="2" pattern="#0.00" />
+													</h:inputText>
+												</div>
+											</div>
+										</div>
+										<br />
+										<div class="row">
+											<div class="form-group ">
+												<div class="col-md-6">
+													<p:commandLink id="buttonRegistrar"
+														value="&#160; COBRAR NOTA VENTA"
+														styleClass="btn btn-success btn-block ion-social-usd"
+														update="formModalNotaVenta"
+														style="height:35px; padding:center"
+														rendered="#{ ! cajaController.verReporteFactura}"
+														oncomplete="PF('dlgNotaVenta').show();">
+													</p:commandLink>
+													<p:hotkey bind="ctrl+g"
+														action="#{cajaController.loadDialogPrintBrowser()}" />
+												</div>
+												<div class="col-md-6">
+													<p:commandLink id="buttonRegistrar1"
+														value="&#160; COBRAR FACTURA"
+														styleClass="btn btn-primary btn-block ion-social-usd"
+														update="formModalFactura"
+														style="height:35px; padding:center"
+														rendered="#{ ! cajaController.verReporteFactura}"
+														disabled="#{cajaController.puedofacturar=='false'}"
+														oncomplete="PF('dlgFactura').show();">
+													</p:commandLink>
+													<p:hotkey bind="ctrl+g"
+														action="#{cajaController.loadDialogPrintBrowser()}" />
+												</div>
+											</div>
+										</div>
+										<br />
+										<div class="row">
+											<div class="form-group ">
+												<div class="col-md-12">
+													<p:dataTable id="table001" var="var"
+														value="#{cajaController.listDetalleFactura}"
+														scrollable="true"
+														binding="#{cajaController.usersDataTable}"
+														emptyMessage="Agregue Detalles." reflow="true"
+														scrollHeight="500"
+														style="font-size: 13px !important; line-height: 1.33846154 !important; font-family: sans-serif !important;"
+														editable="true" editMode="cell">
+														<f:facet name="header">
+           														Detalle Factura
+       														</f:facet>
+
+														<p:ajax event="cellEdit" update="form001:table001" />
+
+														<p:column width="35%" headerText="Concepto">
+															<h:outputText value="#{var.concepto}" />
+														</p:column>
+														<p:column width="12%" headerText="Cant."
+															style="text-align:center;">
+															<p:cellEditor>
+																<f:facet name="output">
+																	<h:outputText value="#{var.cantidad}" />
+																</f:facet>
+																<f:facet name="input">
+																	<p:inputText id="debeE" value="#{var.cantidad}"
+																		label="label">
+
+																	</p:inputText>
+																</f:facet>
+															</p:cellEditor>
+														</p:column>
+														<p:column headerText="Precio" style="text-align:center;">
+															<p:cellEditor>
+																<f:facet name="output">
+																	<h:outputText value="#{var.precioUnitario}">
+																		<f:convertNumber type="number" groupingUsed="true"
+																			minFractionDigits="2" pattern="#0.00" />
+																	</h:outputText>
+																</f:facet>
+																<f:facet name="input">
+																	<p:inputText id="haberB" value="#{var.precioUnitario}"
+																		style="width:100%;" label="label">
+
+																	</p:inputText>
+																</f:facet>
+															</p:cellEditor>
+														</p:column>
+														<p:column headerText="Total" style="text-align:center;">
+															<h:outputText value="#{var.precioTotal}">
+																<f:convertNumber type="number" groupingUsed="true"
+																	minFractionDigits="2" pattern="#0.00" />
+															</h:outputText>
+														</p:column>
+
+														<p:column width="6%" headerText=" "
+															style="text-align:center;">
+															<p:commandLink id="buttonTableEliminar" value=" X">
+																<p:ajax immediate="true"
+																	update="form001:table001,form001:totalID"
+																	listener="#{cajaController.eliminarDetalleFactura(var.codigoProducto)}" />
+															</p:commandLink>
+														</p:column>
+													</p:dataTable>
+												</div>
+											</div>
+										</div>
+										<br />
+										<ui:fragment rendered="false">
+											<div class="row">
+												<div class="form-group ">
+													<div class="col-md-5">
+														<h3>TOTAL Bs.</h3>
+													</div>
+													<div class="col-md-7">
+														<h:inputText id="total1ID"
+															value="#{cajaController.totalImporte}"
+															style="font-size: 20pt; color: #555555; background-image: none; text-align: center;"
+															styleClass="input-lg form-control" readonly="true">
+															<f:convertNumber type="number" groupingUsed="true"
+																minFractionDigits="2" pattern="#0.00" />
+														</h:inputText>
+													</div>
+												</div>
+											</div>
+										</ui:fragment>
+										<br />
+
+									</div>
+								</div>
+							</div>
+							<div class="col-md-7">
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<h3 class="panel-title">CAJA</h3>
+										<div class="actions mtn">
+											<div class="btn-group btn-group-xs ">
+												<p:commandLink id="buttonNuevoEquipo"
+													value=" &#160; Pendiente"
+													styleClass="btn btn-warning btn-circle  btn-circle ion-clock"
+													update="formModalPendientes" style="height:25px;"
+													immediate="true"
+													oncomplete="PF('dlgVentasPendiendtes').show();">
+												</p:commandLink>
+											</div>
+
+										</div>
+									</div>
+
+									<div class="panel-body " style="padding: 10px; height: 750px;">
+										<!-- start here register -->
+										<div class="row">
+											<div class="col-md-12">
+												<p:tabView>
+													<p:tab title="LISTA DE PRODUCTOS">
+														<p:scrollPanel mode="native"
+															style="width:100%; height:650px;">
+															<p:dataGrid var="prod"
+																value="#{cajaController.listProducto}" columns="6"
+																layout="grid" id="productos">
+																<div class="panel panel-primary panel-bordered">
+																	<div class="panel-heading" style="padding: 0px 0px;">
+																		<h3 class="panel-title" style="text-align: center;">
+																			<p:outputLabel value="#{prod.nombre}"
+																				style="font-size: 10px !important;" />
+																		</h3>
+																	</div>
+																	<div class="panel-body" style="text-align: center;">
+																		<p:commandLink>
+
+																			<p:graphicImage id="fImageId"
+																				value="#{dynamicResourceController.streamedContentImage}"
+																				cache="false" width="100%" height="100">
+																				<f:param name="param" value="#{prod.id}" />
+																			</p:graphicImage>
+																			<span class="label label-primary"><p:outputLabel
+																					value="Bs. #{prod.precioUnitario}" /></span>
+																			<p:ajax
+																				update="form001:table001,form001:totalID,formGrowl:msgs1"
+																				listener="#{cajaController.loadProducto(prod.id)}" />
+																		</p:commandLink>
+																	</div>
+																</div>
+
+															</p:dataGrid>
+														</p:scrollPanel>
+													</p:tab>
+												</p:tabView>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!-- END PANEL REGISTER -->
+						</div>
+					</ui:fragment>
+					<ui:fragment rendered="#{  cajaController.verReporte}">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<h3 class="panel-title">Reporte</h3>
+									</div>
+									<div class="panel-body">
+										<div class="tabbable-custom">
+											<ul class="nav nav-tabs">
+												<li class="active"><a href="#tab_5_1" data-toggle="tab">REPORTE
+														FACTURA</a></li>
+												<li><a href="#tab_5_2" data-toggle="tab">REPORTE
+														FICHA ORDEN</a></li>
+											</ul>
+											<div class="tab-content">
+												<div id="tab_5_1" class="tab-pane active">
+													<div class="row">
+														<p:media player="pdf" rendered="true"
+															value="#{cajaController.url}" width="800px"
+															height="1125px" />
+													</div>
+												</div>
+												<div id="tab_5_2" class="tab-pane ">
+													<div class="row">
+														<p:media player="pdf" rendered="true"
+															value="#{cajaController.urlFicha}" width="800px"
+															height="1125px" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</ui:fragment>
+				</h:form>
+
+				<h:form id="form002">
+					<div class="row">
+						<iframe src="#{cajaController.fileTempPrintFact}" width="0px;"
+							height="0px;" id="PDFtoPrint"> </iframe>
+					</div>
+				</h:form>
+
+			</section>
+		</div>
+		<!--END CONTENT-->
+
+		<!-- START GROWL formGrowl:msgs1 -->
+		<h:form id="formGrowl">
+			<p:growl id="msgs1" showDetail="true" />
+		</h:form>
+		<!-- END GROWL -->
+
+		<!--  FACTURAR -->
+		<p:dialog showEffect="explode" header="Factura" widgetVar="dlgFactura"
+			resizable="false" position="center" width="40%"
+			styleClass="customDialog" id="modalVistaPrevia"
+			visible="#{not empty facesContext.maximumSeverity}">
+			<h:form id="formModalFactura">
+				<div class="row">
+					<div class="col-md-12">
+						<div class="form-group ">
+							<div class="col-md-3">Nit</div>
+							<div class="col-md-9">
+								<p:autoComplete id="dlgAutoCompleteNit" style="width: 100%"
+									inputStyle="width: 100%; color: #555555; background-image: none; font-size: 15pt;"
+									value="#{cajaController.textoAutoCompleteNit}"
+									completeMethod="#{cajaController.completeClienteNit}"
+									maxResults="10" placeholder="Nit Cliente">
+									<p:ajax event="change" />
+									<p:ajax event="itemSelect"
+										update="formModalFactura,dlgNombreClienteID"
+										listener="#{cajaController.onRowSelectClienteNitClick}" />
+								</p:autoComplete>
+							</div>
+						</div>
+						<div class="form-group ">
+							<div class="col-md-3">Nombre</div>
+							<div class="col-md-9">
+								<p:autoComplete id="dlgNombreClienteID" style="width: 100%"
+									inputStyle="width: 100%; color: #555555; background-image: none; font-size: 15pt;"
+									value="#{cajaController.textoAutoCompleteCliente}"
+									completeMethod="#{cajaController.completeClienteNombre}"
+									maxResults="10" placeholder="Nombre Cliente">
+									<p:ajax event="change" />
+									<p:ajax event="itemSelect"
+										update="formModalFactura,dlgAutoCompleteNit"
+										listener="#{cajaController.onRowSelectClienteNombreClick}" />
+								</p:autoComplete>
+							</div>
+						</div>
+					</div>
+				</div>
+				<hr />
+				<div class="row">
+					<div class="col-md-12">
+						<div class="form-group ">
+							<div class="col-md-3">Valor a Pagar</div>
+							<div class="col-md-9">
+								<h:inputText id="dlgTotalID"
+									value="#{cajaController.totalImporte}"
+									style=" color: #555555; background-image: none; font-size: 15pt;"
+									styleClass="input-lg form-control" readonly="true">
+									<f:convertNumber type="number" groupingUsed="true"
+										minFractionDigits="2" pattern="#0.00" />
+								</h:inputText>
+							</div>
+						</div>
+						<br />
+						<div class="form-group ">
+							<div class="col-md-3">Efectivo</div>
+							<div class="col-md-9">
+								<h:inputText id="dlgEfectivoID"
+									value="#{cajaController.efectivoBolivianos}"
+									style=" color: #555555; background-image: none; font-size: 15pt;"
+									styleClass="input-lg form-control" autocomplete="off">
+									<f:convertNumber type="number" groupingUsed="true"
+										minFractionDigits="2" pattern="#0.00" />
+									<p:ajax event="keyup" update="dlgCambioID"
+										listener="#{cajaController.calcularCambio()}" />
+								</h:inputText>
+							</div>
+						</div>
+						<br />
+						<div class="form-group ">
+							<div class="col-md-3">Cambio</div>
+							<div class="col-md-9">
+								<h:inputText id="dlgCambioID"
+									value="#{cajaController.totalCambio}"
+									style=" color: #555555; background-image: none; font-size: 15pt;"
+									styleClass="input-lg form-control" readonly="true">
+									<f:convertNumber type="number" groupingUsed="true"
+										minFractionDigits="2" pattern="#0.00" />
+								</h:inputText>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="form-group "></div>
+					</div>
+				</div>
+				<div class="row"></div>
+				<div class="row">
+					<div class="col-md-12">
+						<div class="form-group">
+							<div class="col-md-4"></div>
+							<div class="col-md-4">
+								<p:commandLink id="buttonCancelar" value="&#160; Cancelar"
+									styleClass="btn btn-warning btn-block"
+									onclick="PF('dlgFactura').hide();">
+								</p:commandLink>
+							</div>
+							<div class="col-md-4">
+								<p:commandLink value="Aceptar"
+									styleClass="btn btn-primary btn-block">
+									<p:ajax update="form001,formGrowl:msgs1"
+										listener="#{cajaController.registrarEImprimir()}" />
+								</p:commandLink>
+							</div>
+						</div>
+					</div>
+				</div>
+			</h:form>
+		</p:dialog>
+
+		<!-- dialog NotaVenta -->
+		<p:dialog showEffect="explode" header="NotaVenta"
+			widgetVar="dlgNotaVenta" resizable="false" position="center"
+			width="40%" styleClass="customDialog" id="modalNotaVentaVistaPrevia"
+			visible="#{not empty facesContext.maximumSeverity}">
+			<h:form id="formModalNotaVenta">
+				<div class="row">
+					<div class="col-md-12">						
+						<div class="form-group ">
+							<div class="col-md-3">Nombre</div>
+							<div class="col-md-9">
+								<p:autoComplete id="dlgNotaVentaNombreClienteID"
+									style="width: 100%"
+									inputStyle="width: 100%; color: #555555; background-image: none; font-size: 15pt;"
+									value="#{cajaController.textoAutoCompleteCliente}"
+									completeMethod="#{cajaController.completeClienteNombreNotaVenta}"
+									maxResults="10" placeholder="Nombre Cliente">
+									<p:ajax event="change" />
+									<p:ajax event="itemSelect"
+										update="formModalNotaVenta,dlgNotaVentaNombreClienteID"
+										listener="#{cajaController.onRowSelectClienteNombreNotaVentaClick}" />
+								</p:autoComplete>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+				<hr />
+				<div class="row">
+					<div class="col-md-12">
+						<div class="form-group ">
+							<div class="col-md-3">Valor a Pagar</div>
+							<div class="col-md-9">
+								<h:inputText id="dlgNotaVentaTotalID"
+									value="#{cajaController.totalImporte}"
+									style=" color: #555555; background-image: none; font-size: 15pt;"
+									styleClass="input-lg form-control" readonly="true">
+									<f:convertNumber type="number" groupingUsed="true"
+										minFractionDigits="2" pattern="#0.00" />
+								</h:inputText>
+							</div>
+						</div>
+						<br />
+						<div class="form-group ">
+							<div class="col-md-3">Efectivo</div>
+							<div class="col-md-9">
+								<h:inputText id="dlgNotaVentaEfectivoID"
+									value="#{cajaController.efectivoBolivianos}"
+									style=" color: #555555; background-image: none; font-size: 15pt;"
+									styleClass="input-lg form-control" autocomplete="off">
+									<f:convertNumber type="number" groupingUsed="true"
+										minFractionDigits="2" pattern="#0.00" />
+									<p:ajax event="keyup" update="dlgNotaVentaCambioID"
+										listener="#{cajaController.calcularCambio()}" />
+								</h:inputText>
+							</div>
+						</div>
+						<br />
+						<div class="form-group ">
+							<div class="col-md-3">Cambio</div>
+							<div class="col-md-9">
+								<h:inputText id="dlgNotaVentaCambioID"
+									value="#{cajaController.totalCambio}"
+									style=" color: #555555; background-image: none; font-size: 15pt;"
+									styleClass="input-lg form-control" readonly="true">
+									<f:convertNumber type="number" groupingUsed="true"
+										minFractionDigits="2" pattern="#0.00" />
+								</h:inputText>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="form-group "></div>
+					</div>
+				</div>
+				<div class="row"></div>
+				<div class="row">
+					<div class="col-md-12">
+						<div class="form-group">
+							<div class="col-md-4"></div>
+							<div class="col-md-4">
+								<p:commandLink id="buttonNotaVentaCancelar"
+									value="&#160; Cancelar" styleClass="btn btn-warning btn-block"
+									onclick="PF('dlgNotaVenta').hide();">
+								</p:commandLink>
+							</div>
+							<div class="col-md-4">
+								<p:commandLink value="Aceptar"
+									styleClass="btn btn-primary btn-block">
+									<p:ajax update=":form001,formGrowl:msgs1"
+										listener="#{cajaController.registrarEImprimirNotaVenta()}" />
+								</p:commandLink>
+							</div>
+						</div>
+					</div>
+				</div>
+			</h:form>
+		</p:dialog>
+
+		<!--  PENDIENTES -->
+		<p:dialog showEffect="explode" header="VENTAS PENDIENTES"
+			widgetVar="dlgVentasPendiendtes" resizable="false" modal="true"
+			position="center" width="40%" styleClass="customDialog"
+			id="modalVistaPreviaPendiente"
+			visible="#{not empty facesContext.maximumSeverity}">
+			<h:form id="formModalPendientes">
+				<div class="row">
+					<div class="col-md-12">
+						<div class="form-group ">
+							<div class="col-md-3">Test</div>
+							<div class="col-md-9">Test</div>
+						</div>
+					</div>
+				</div>
+			</h:form>
+		</p:dialog>
+
+	</ui:define>
+
+</ui:composition>

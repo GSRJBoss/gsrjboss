@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+	template="/WEB-INF/templates/template_main.xhtml">
+	<ui:define name="head">
+		<title>DEMO MODAL</title>
+
+	</ui:define>
+
+	<ui:define name="content">
+		<!--BEGIN CONTENT-->
+		<div class="content">
+			<section class="main-content"
+				style="background-color: #f5f6f6; padding-top: 0px;">
+				<h:form id="form001">
+					<!-- BEGIN BUTTONS -->
+					<div class="row" style="background-color: #f9fafa;">
+						<section class="content-header">
+							<div class="pull-left"
+								style="padding-top: 8px; padding-left: 10px;">
+								<div class="btn-group-demo">
+									<div class="btn-group">
+
+										<p:commandLink id="buttonCancelar" value="&#160; Modal"
+											styleClass="btn btn-primaary ion-minus-circled"
+											update="form001" rendered="true"
+											style="height:31px; padding:center"
+											onclick="openModal('modal-responsive');">
+										</p:commandLink>
+
+										<a href="#modal-prompt" data-toggle="modal"
+											class="btn grey btn-sm">Demo</a>
+
+
+									</div>
+								</div>
+							</div>
+							<div class="pull-right">
+								<ol class="breadcrumb">
+									<li><a href="#{request.contextPath}/pages/dashboard.xhtml"
+										style="color: #0090FF; font-size: 12px;">Inicio</a></li>
+									<li><a
+										href="#{request.contextPath}/pages/proceso/documento.xhtml"
+										style="color: #0090FF; font-size: 12px;">Proceso</a></li>
+									<li class="active" style="font-size: 12px;">Documento</li>
+								</ol>
+							</div>
+						</section>
+					</div>
+					<!-- END BUTTONS -->
+
+					<!-- BEGIN PANEL REGISTER -->
+					<div class="row" style="padding-top: 10px;">
+						<div class="col-md-4">
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<h3 class="panel-title">Registro Datos Object</h3>
+								</div>
+								<div class="panel-body">
+									<!-- start here register -->
+									<div class="row">
+										<div class="col-md-12 box-content form-horizontal">
+
+											<div class="form-group "></div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<!-- END PANEL REGISTER -->
+
+						<!-- BEGIN PANEL TABLE -->
+						<div class="col-md-8">
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<h3 class="panel-title">Lista Object</h3>
+								</div>
+								<div class="panel-body">
+									<!-- start here register -->
+									<div class="row">
+										<div class="col-md-12 box-content form-horizontal"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- END PANEL TABLE -->
+				</h:form>
+			</section>
+		</div>
+
+		<!--END CONTENT-->
+
+		<!--Modal Prompt-->
+		<div id="modal-prompt" tabindex="-1" role="dialog"
+			aria-labelledby="myModalLabel" aria-hidden="true" class="modal fade">
+			<div class="modal-dialog modal-sm">
+				<div class="modal-content">
+					<div class="modal-header bg-primary">
+						<button type="button" data-dismiss="modal" class="close">
+							<span aria-hidden="true">x</span><span class="sr-only">Cerrar</span>
+						</button>
+						<h4 id="myModalLabel" class="modal-title">MODAL INFORMACION</h4>
+					</div>
+					<div class="modal-body">
+						<div class="input-icon">
+							<i class="icon-envelope-open"></i> <input type="text"
+								placeholder="Email Address" class="form-control" />
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-success">Save</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--Modal Responsive-->
+		<div id="modal-responsive" tabindex="-1" role="dialog"
+			aria-labelledby="myModalLabel" aria-hidden="true" class="modal fade">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" data-dismiss="modal" class="close">
+							<span aria-hidden="true">x</span><span class="sr-only">Cerrar</span>
+						</button>
+						<h4 id="myModalLabel" class="modal-title">Modal Responsive Informacion</h4>
+					</div>
+					<div class="modal-body">
+						<div class="row">
+							<div class="col-md-6">
+								
+							</div>
+							<div class="col-md-6">
+								
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- START GROWL formGrowl:msgs1 -->
+		<h:form id="formGrowl">
+			<p:growl id="msgs1" showDetail="true" />
+		</h:form>
+		<!-- END GROWL -->
+
+
+
+	</ui:define>
+
+	<ui:insert name="scripts">
+
+	</ui:insert>
+</ui:composition>

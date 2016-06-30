@@ -1,0 +1,663 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+	template="/WEB-INF/templates/template_main.xhtml">
+
+	<ui:define name="head">
+		<title>Factura</title>
+		<f:event listener="#{facturaController.initConversation}"
+			type="preRenderView"></f:event>
+	</ui:define>
+
+	<ui:define name="content">
+		<!--BEGIN CONTENT-->
+		<div class="content">
+			<section class="main-content"
+				style="background-color: #f5f6f6; padding-top: 0px;">
+				<h:form id="form001">
+					<!-- BEGIN BUTTONS -->
+
+					<div class="row" style="background-color: #f9fafa;">
+						<section class="content-header">
+							<div class="pull-left"
+								style="padding-top: 8px; padding-left: 10px;">
+								<div class="btn-group-demo">
+									<div class="btn-group">
+
+										<p:commandLink id="buttonCancelar" value="&#160; Atras"
+											styleClass="btn btn-warning ion-minus-circled"
+											update="form001" immediate="true"
+											style="height:31px; padding:center"
+											onclick="location.href='#{request.contextPath}/pages/venta/facturacion_index.xhtml'">
+										</p:commandLink>
+
+										<p:commandLink id="buttonRegistrar" value="&#160; Registrar"
+											styleClass="btn btn-success ion-checkmark"
+											update="formModalFactura" style="height:31px; padding:center"
+											rendered="#{ ! facturaController.verReporteFactura and facturaController.puedofacturar=='true'}"
+											oncomplete="PF('dlgFactura').show();">
+										</p:commandLink>
+
+
+									</div>
+								</div>
+							</div>
+							<div class="pull-right">
+								<ol class="breadcrumb">
+									<li><a href="#{request.contextPath}/pages/dashboard.xhtml"
+										style="color: #0090FF; font-size: 12px;">Inicio</a></li>
+									<li><a
+										href="#{request.contextPath}/pages/venta/factura.xhtml"
+										style="color: #0090FF; font-size: 12px;">Venta</a></li>
+									<li class="active" style="font-size: 12px;">Factura</li>
+								</ol>
+							</div>
+						</section>
+					</div>
+					<!-- END BUTTONS -->
+
+					<ui:fragment rendered="#{ ! facturaController.verReporteFactura}">
+						<div class="row" style="padding-top: 10px;">
+							<!-- BEGIN PANEL REGISTER -->
+							<div class="col-md-12">
+								<div class="panel panel-default">
+									<strong> <span class="alert-warning"><h:outputText
+												lang="es"
+												rendered="#{facturaConceptoController.diasrestantes gt -1 and facturaConceptoController.diasrestantes lt 30}"
+												value="Faltan #{facturaConceptoController.diasrestantes} dias">
+												<f:convertNumber pattern="0######" />
+											</h:outputText></span> <span class="alert-danger"><h:outputText lang="es"
+												rendered="#{facturaController.puedofacturar=='false'}"
+												value="Pasaron #{facturaConceptoController.diasrestantes} dias, Por favor tiene que Dosificar">
+												<f:convertNumber pattern="0######" />
+											</h:outputText></span>
+									</strong>
+									<div class="panel-heading">
+										<h3 class="panel-title">Nueva Factura</h3>
+									</div>
+									<div class="panel-body">
+										<!-- start here register -->
+										<div class="row">
+											<div class="col-md-4">
+												<div class="form-group ">
+													<div class="col-md-3" style="padding-right: 1px;">Nro.
+														Factura:</div>
+													<div class="col-md-9">
+														<h:inputText
+															value="FAC-0#{facturaController.numeroFactura}"
+															style=" color: #555555; background-image: none;"
+															styleClass="input-sm form-control" readonly="true">
+														</h:inputText>
+													</div>
+												</div>
+											</div>
+											<div class="col-md-4">
+												<div class="form-group ">
+													<div class="col-md-4" style="padding-right: 1px;">Fecha
+														Emision:</div>
+													<div class="col-md-8">
+														<p:calendar id="popup" pattern="dd/MM/yyyy"
+															styleClass="ui-inputfield input-sm" rendered="false"
+															value="#{facturaController.newFactura.fechaFactura}"
+															readonly="true">
+															<p:ajax />
+														</p:calendar>
+														<h:inputText
+															value="#{facturaController.newFactura.fechaFactura}"
+															style=" color: #555555; background-image: none;"
+															styleClass="input-sm form-control" readonly="true">
+															<f:convertDateTime pattern="dd/MM/yyyy" />
+														</h:inputText>
+													</div>
+												</div>
+											</div>
+											<div class="col-md-4">
+												<div class="form-group ">
+													<div class="col-md-3">Autorización:</div>
+													<div class="col-md-9">
+														<h:inputText
+															value="#{facturaController.dosificacion.numeroAutorizacion}"
+															style=" color: #555555; background-image: none;"
+															styleClass="input-sm form-control" readonly="true">
+														</h:inputText>
+													</div>
+												</div>
+											</div>
+										</div>
+										<br />
+										<ui:fragment rendered="false">
+											<div class="row">
+												<div class="col-md-4">
+													<div class="form-group ">
+														<div class="col-md-3">Cliente</div>
+														<div class="col-md-4" style="padding-right: 1px;">
+															<p:autoComplete id="autoCompleteNit" style="width: 100%"
+																inputStyle="width: 100%; color: #555555; background-image: none;"
+																value="#{facturaController.textoAutoCompleteNit}"
+																completeMethod="#{facturaController.completeClienteNit}"
+																maxResults="10" placeholder="Nit">
+																<p:ajax event="itemSelect" update="nombreClienteID"
+																	listener="#{facturaController.onRowSelectClienteNitClick}" />
+															</p:autoComplete>
+														</div>
+														<div class="col-md-5" style="padding-left: 1px;">
+															<p:autoComplete id="nombreClienteID" style="width: 100%"
+																inputStyle="width: 100%; color: #555555; background-image: none;"
+																value="#{facturaController.textoAutoCompleteCliente}"
+																completeMethod="#{facturaController.completeClienteNombre}"
+																maxResults="10" placeholder="Nombre">
+																<p:ajax event="itemSelect" update="autoCompleteNit"
+																	listener="#{facturaController.onRowSelectClienteNombreClick}" />
+															</p:autoComplete>
+														</div>
+													</div>
+												</div>
+												<div class="col-md-4l">
+													<div class="form-group "></div>
+												</div>
+											</div>
+										</ui:fragment>
+										<hr />
+
+										<div class="row">
+											<div class="col-md-12">
+												<p:selectOneButton
+													value="#{facturaController.productoServicio}">
+													<f:selectItem itemLabel="Concepto" itemValue="concepto" />
+													<f:selectItem itemLabel="Producto" itemValue="producto" />
+													<f:selectItem itemLabel="Servicio" itemValue="servicio" />
+													<p:ajax event="change" update="form001" />
+												</p:selectOneButton>
+											</div>
+											<p:fragment
+												rendered="#{facturaController.productoServicio=='producto'}">
+												<div class="row">
+													<div class="panel-body">
+
+														<div class="form-group">
+															<div class="col-md-6" style="padding-top: 5px;">
+																<p:autoComplete id="event" style="width: 100%"
+																	inputStyle="width: 100%; color: #555555; background-image: none;"
+																	value="#{facturaController.texto}"
+																	completeMethod="#{facturaController.completeText}"
+																	maxResults="10" dropdown="true">
+																	<p:ajax event="itemSelect"
+																		listener="#{facturaController.onItemSelect}"
+																		update="precioUnitarioID,importeID" />
+																</p:autoComplete>
+																<p:watermark
+																	value="#{facturaController.productoServicio}"
+																	for="event" />
+															</div>
+															<div class="col-md-1"></div>
+															<div class="col-sm-2"></div>
+														</div>
+														<div class="col-md-10">
+															<br />
+															<div class="form-group">
+																<div class="col-md-2">Precio Venta</div>
+																<div class="col-md-2">
+																	<h:inputText id="precioUnitarioID"
+																		value="#{facturaController.selectedProducto.precioUnitario}"
+																		style=" color: #555555; background-image: none;"
+																		styleClass="input-sm form-control" disabled="false">
+																		<p:ajax event="keyup" update="importeID"
+																			listener="#{facturaController.modificarDetalleProducto()}" />
+																	</h:inputText>
+																</div>
+																<div class="col-md-2">Cantidad</div>
+																<div class="col-md-2">
+																	<h:inputText id="cantidadProductoID"
+																		value="#{facturaController.cantidad}"
+																		style=" color: #555555; background-image: none;"
+																		styleClass="input-sm form-control">
+																		<p:ajax event="keyup" update="importeID"
+																			listener="#{facturaController.modificarDetalleProducto()}" />
+																	</h:inputText>
+																</div>
+																<div class="col-md-2">Importe</div>
+																<div class="col-md-2">
+																	<h:inputText id="importeID"
+																		value="#{facturaController.totalImportePorProducto}"
+																		style=" color: #555555; background-image: none;"
+																		styleClass="input-sm form-control" disabled="true">
+																	</h:inputText>
+																</div>
+															</div>
+														</div>
+														<div class="col-md-2">
+															<br />
+															<div class="form-group">
+																<div class="col-md-12">
+																	<p:commandLink id="buttonAceptarDialog1wsdf"
+																		value="Agregar" styleClass="btn btn-success btn-block">
+																		<p:ajax
+																			update="table001,event,precioUnitarioID,cantidadProductoID,importeID,totalID,formGrowl:msgs1"
+																			listener="#{facturaController.agregarProducto()}" />
+																	</p:commandLink>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+
+											</p:fragment>
+
+											<p:fragment
+												rendered="#{facturaController.productoServicio=='servicio'}">
+												<div class="row">
+													<div class="panel-body">
+														<div class="form-group">
+															<div class="col-md-6" style="padding-top: 5px;">
+																<p:autoComplete id="eventServicio" style="width: 100%"
+																	inputStyle="width: 100%; color: #555555; background-image: none;"
+																	value="#{facturaController.textoServicio}"
+																	completeMethod="#{facturaController.completeTextServicio}"
+																	maxResults="10" dropdown="true">
+																	<p:ajax event="itemSelect"
+																		listener="#{facturaController.onItemSelectServicio}"
+																		update="precioUnitarioServicioID,cantidadServicioID,importeServicioID" />
+																</p:autoComplete>
+																<p:watermark
+																	value="#{facturaController.productoServicio}"
+																	for="eventServicio" />
+															</div>
+															<div class="col-md-1"></div>
+															<div class="col-sm-2"></div>
+														</div>
+														<div class="col-md-10">
+															<br />
+															<div class="form-group">
+																<div class="col-md-2">Precio Venta</div>
+																<div class="col-md-2">
+																	<h:inputText id="precioUnitarioServicioID"
+																		value="#{facturaController.selectedServicio.precioUnitario}"
+																		style=" color: #555555; background-image: none;"
+																		styleClass="input-sm form-control" disabled="false">
+																		<p:ajax event="keyup" update="importeServicioID"
+																			listener="#{facturaController.modificarDetalleServicio()}" />
+																	</h:inputText>
+																</div>
+																<div class="col-md-2">Cantidad</div>
+																<div class="col-md-2">
+																	<h:inputText id="cantidadServicioID"
+																		value="#{facturaController.cantidad}"
+																		style=" color: #555555; background-image: none;"
+																		styleClass="input-sm form-control">
+																		<p:ajax event="keyup" update="importeServicioID"
+																			listener="#{facturaController.modificarDetalleServicio()}" />
+																	</h:inputText>
+																</div>
+																<div class="col-md-2">Importe</div>
+																<div class="col-md-2">
+																	<h:inputText id="importeServicioID"
+																		value="#{facturaController.totalImportePorProducto}"
+																		style=" color: #555555; background-image: none;"
+																		styleClass="input-sm form-control" disabled="true">
+																	</h:inputText>
+																</div>
+															</div>
+														</div>
+														<div class="col-md-2">
+															<br />
+															<div class="form-group">
+																<div class="col-md-12">
+																	<p:commandLink id="buttonAceptarDialog12"
+																		value="Agregar" styleClass="btn btn-success btn-block">
+																		<p:ajax
+																			update="table001,eventServicio,precioUnitarioServicioID,cantidadServicioID,importeServicioID,totalID,formGrowl:msgs1"
+																			listener="#{facturaController.agregarServicio()}" />
+																	</p:commandLink>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</p:fragment>
+
+											<p:fragment
+												rendered="#{facturaController.productoServicio=='concepto'}">
+												<div class="row">
+													<div class="panel-body">
+														<div class="form-group">
+															<div class="col-md-6" style="padding-top: 5px;">
+																<p:inputTextarea id="conceptoID"
+																	styleClass="form-control" size="50"
+																	value="#{facturaController.concepto}" rows="3">
+																	<p:ajax event="change" />
+																</p:inputTextarea>
+																<p:watermark value="Concepto" for="conceptoID" />
+															</div>
+															<div class="col-md-1"></div>
+															<div class="col-sm-2"></div>
+														</div>
+														<div class="col-md-10">
+															<br />
+															<div class="form-group">
+																<div class="col-md-2">Precio Venta</div>
+																<div class="col-md-2">
+																	<h:inputText id="precioUnitarioConceptoID"
+																		value="#{facturaController.precioUnitarioConcepto}"
+																		style=" color: #555555; background-image: none;"
+																		styleClass="input-sm form-control" disabled="false">
+																		<p:ajax event="keyup" update="importeConceptoD"
+																			listener="#{facturaController.modificarDetalleProducto()}" />
+																	</h:inputText>
+																</div>
+																<div class="col-md-2">Cantidad</div>
+																<div class="col-md-2">
+																	<h:inputText id="cantidadConceptoID"
+																		value="#{facturaController.cantidad}"
+																		style=" color: #555555; background-image: none;"
+																		styleClass="input-sm form-control">
+																		<p:ajax event="keyup" update="importeConceptoD"
+																			listener="#{facturaController.modificarDetalleProducto()}" />
+																	</h:inputText>
+																</div>
+																<div class="col-md-2">Importe</div>
+																<div class="col-md-2">
+																	<h:inputText id="importeConceptoD"
+																		value="#{facturaController.totalImportePorProducto}"
+																		style=" color: #555555; background-image: none;"
+																		styleClass="input-sm form-control" disabled="true">
+																	</h:inputText>
+																</div>
+															</div>
+														</div>
+														<div class="col-md-2">
+															<br />
+															<div class="form-group">
+																<div class="col-md-12">
+																	<p:commandLink id="buttonAceptarDialog3wsdf"
+																		value="Agregar" styleClass="btn btn-success btn-block">
+																		<p:ajax
+																			update="table001,precioUnitarioConceptoID,cantidadConceptoID,importeConceptoD,totalID,conceptoID,formGrowl:msgs1"
+																			listener="#{facturaController.agregarConcepto()}" />
+																	</p:commandLink>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</p:fragment>
+										</div>
+									</div>
+
+									<div class="row">
+										<div class="col-md-12">
+											<div class="form-group ">
+												<div class="col-md-12">
+													<p:dataTable id="table001" var="var" rendered="true"
+														value="#{facturaController.listDetalleFactura}"
+														binding="#{facturaController.usersDataTable}"
+														emptyMessage="Agregue Detalles." reflow="true"
+														style="font-size: 12px !important; line-height: 1.33846154 !important; font-family: sans-serif !important;"
+														editable="true" editMode="cell">
+														<f:facet name="header">
+           													Detalle Factura
+       													</f:facet>
+
+														<p:ajax event="cellEdit" update="form001:table001" />
+
+														<p:column width="10%" headerText="Código"
+															disabledSelection="true" style="text-align:center;">
+															<h:outputText value="#{var.codigoProducto}" />
+
+														</p:column>
+														<p:column width="35%" headerText="Concepto">
+															<p:cellEditor>
+																<f:facet name="output">
+																	<h:outputText value="#{var.concepto}" />
+																</f:facet>
+																<f:facet name="input">
+																	<p:commandLink id="buttonAceptarModal1"
+																		value="Seleccione Producto"
+																		onclick="PF('dlg0').show();">
+																		<p:ajax
+																			listener="#{facturaController.setSelectedIdEDFactura(var.id)}" />
+																	</p:commandLink>
+																</f:facet>
+															</p:cellEditor>
+														</p:column>
+														<p:column width="10%" headerText="Cantidad"
+															style="text-align:center;">
+															<p:cellEditor>
+																<f:facet name="output">
+																	<h:outputText value="#{var.cantidad}" />
+																</f:facet>
+																<f:facet name="input">
+																	<p:inputText id="debeE" value="#{var.cantidad}"
+																		label="label">
+
+																	</p:inputText>
+																</f:facet>
+															</p:cellEditor>
+														</p:column>
+														<p:column headerText="Precio Venta"
+															style="text-align:center;">
+															<p:cellEditor>
+																<f:facet name="output">
+																	<h:outputText value="#{var.precioUnitario}">
+																		<f:convertNumber type="number" groupingUsed="true"
+																			minFractionDigits="2" pattern="#0.00" />
+																	</h:outputText>
+																</f:facet>
+																<f:facet name="input">
+																	<p:inputText id="haberB" value="#{var.precioUnitario}"
+																		style="width:100%;" label="label">
+
+																	</p:inputText>
+																</f:facet>
+															</p:cellEditor>
+														</p:column>
+														<p:column headerText="Precio Total"
+															style="text-align:center;">
+															<p:cellEditor>
+																<f:facet name="output">
+																	<h:outputText value="#{var.precioTotal}">
+																		<f:convertNumber type="number" groupingUsed="true"
+																			minFractionDigits="2" pattern="#0.00" />
+																	</h:outputText>
+																</f:facet>
+																<f:facet name="input">
+																	<p:inputText id="precioTotalB"
+																		value="#{var.precioTotal}" style="width:100%;"
+																		label="label">
+																	</p:inputText>
+																</f:facet>
+															</p:cellEditor>
+														</p:column>
+
+														<p:column width="6%" headerText="Edición"
+															style="text-align:center;">
+															<p:commandLink id="buttonTableEliminar" value=" Eliminar">
+																<p:ajax immediate="true"
+																	update="form001:table001,form001:totalID"
+																	listener="#{facturaController.eliminarDetalleFactura(var.codigoProducto)}" />
+															</p:commandLink>
+														</p:column>
+													</p:dataTable>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="panel-body">
+										<div class="row">
+											<div class="form-group ">
+												<div class="col-md-2"></div>
+												<div class="col-md-2"></div>
+												<div class="col-md-2"></div>
+												<div class="col-md-2"></div>
+												<div class="col-md-2"
+													style="text-align: center; padding-top: 7px;">
+													<h3>TOTAL Bs.</h3>
+												</div>
+												<div class="col-md-2" style="padding-left: 5px;">
+													<h:inputText id="totalID"
+														value="#{facturaController.totalImporte}"
+														style="font-size: 20pt; color: #555555; background-image: none; text-align: center;"
+														styleClass="input-lg form-control" readonly="true">
+														<f:convertNumber type="number" groupingUsed="true"
+															minFractionDigits="2" pattern="#0.00" />
+													</h:inputText>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!-- END PANEL REGISTER -->
+						</div>
+					</ui:fragment>
+					<ui:fragment rendered="#{facturaController.verReporteFactura}">
+						<div class="row" style="padding-top: 10px;">
+							<!-- BEGIN PANEL REGISTER -->
+							<div class="col-md-12">
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<h3 class="panel-title">Factura</h3>
+									</div>
+									<div class="panel-body" style="text-align: center;">
+										<p:media player="pdf" rendered="true"
+											value="#{facturaController.url}" width="800px"
+											height="1125px" />
+									</div>
+								</div>
+							</div>
+						</div>
+					</ui:fragment>
+				</h:form>
+			</section>
+		</div>
+		<!--END CONTENT-->
+
+		<!-- START GROWL formGrowl:msgs1 -->
+		<h:form id="formGrowl">
+			<p:growl id="msgs1" showDetail="true" />
+		</h:form>
+		<!-- END GROWL -->
+
+		<!--  FACTURAR -->
+
+		<!-- INIT MODAL -->
+		<p:dialog showEffect="explode" header="Factura" widgetVar="dlgFactura"
+			resizable="false" position="center" width="40%"
+			styleClass="customDialog" id="modalVistaPrevia"
+			visible="#{not empty facesContext.maximumSeverity}">
+			<h:form id="formModalFactura">
+				<div class="row">
+					<div class="col-md-12">
+						<div class="form-group ">
+							<div class="col-md-3">Nit</div>
+							<div class="col-md-9">
+								<p:autoComplete id="dlgAutoCompleteNit" style="width: 100%"
+									inputStyle="width: 100%; color: #555555; background-image: none; font-size: 15pt;"
+									value="#{facturaController.textoAutoCompleteNit}"
+									completeMethod="#{facturaController.completeClienteNit}"
+									maxResults="10" placeholder="Nit Cliente">
+									<p:ajax event="change" />
+									<p:ajax event="itemSelect"
+										update="formModalFactura,dlgNombreClienteID"
+										listener="#{facturaController.onRowSelectClienteNitClick}" />
+								</p:autoComplete>
+							</div>
+						</div>
+						<div class="form-group ">
+							<div class="col-md-3">Nombre</div>
+							<div class="col-md-9">
+								<p:autoComplete id="dlgNombreClienteID" style="width: 100%"
+									inputStyle="width: 100%; color: #555555; background-image: none; font-size: 15pt;"
+									value="#{facturaController.textoAutoCompleteCliente}"
+									completeMethod="#{facturaController.completeClienteNombre}"
+									maxResults="10" placeholder="Nombre Cliente">
+									<p:ajax event="change" />
+									<p:ajax event="itemSelect"
+										update="formModalFactura,dlgAutoCompleteNit"
+										listener="#{facturaController.onRowSelectClienteNombreClick}" />
+								</p:autoComplete>
+							</div>
+						</div>
+					</div>
+				</div>
+				<hr />
+				<div class="row">
+					<div class="col-md-12">
+						<div class="form-group ">
+							<div class="col-md-3">Valor a Pagar</div>
+							<div class="col-md-9">
+								<h:inputText id="dlgTotalID"
+									value="#{facturaController.totalImporte}"
+									style=" color: #555555; background-image: none; font-size: 15pt;"
+									styleClass="input-lg form-control" readonly="true">
+									<f:convertNumber type="number" groupingUsed="true"
+										minFractionDigits="2" pattern="#0.00" />
+								</h:inputText>
+							</div>
+						</div>
+						<br />
+						<div class="form-group ">
+							<div class="col-md-3">Efectivo</div>
+							<div class="col-md-9">
+								<h:inputText id="dlgEfectivoID"
+									value="#{facturaController.efectivoBolivianos}"
+									style=" color: #555555; background-image: none; font-size: 15pt;"
+									styleClass="input-lg form-control" autocomplete="off">
+									<f:convertNumber type="number" groupingUsed="true"
+										minFractionDigits="2" pattern="#0.00" />
+									<p:ajax event="keyup" update="dlgCambioID"
+										listener="#{facturaController.calcularCambio()}" />
+								</h:inputText>
+							</div>
+						</div>
+						<br />
+						<div class="form-group ">
+							<div class="col-md-3">Cambio</div>
+							<div class="col-md-9">
+								<h:inputText id="dlgCambioID"
+									value="#{facturaController.totalCambio}"
+									style=" color: #555555; background-image: none; font-size: 15pt;"
+									styleClass="input-lg form-control" readonly="true">
+									<f:convertNumber type="number" groupingUsed="true"
+										minFractionDigits="2" pattern="#0.00" />
+								</h:inputText>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="form-group "></div>
+					</div>
+				</div>
+				<div class="row"></div>
+				<div class="row">
+					<div class="col-md-12">
+						<div class="form-group">
+							<div class="col-md-4"></div>
+							<div class="col-md-4">
+								<p:commandLink id="buttonCancelar" value="&#160; Cancelar"
+									styleClass="btn btn-warning btn-block"
+									onclick="PF('dlgFactura').hide();">
+								</p:commandLink>
+							</div>
+							<div class="col-md-4">
+								<p:commandLink value="Aceptar"
+									styleClass="btn btn-primary btn-block">
+									<p:ajax update="form001,formGrowl:msgs1"
+										listener="#{facturaController.registrarEImprimir()}" />
+								</p:commandLink>
+							</div>
+						</div>
+					</div>
+				</div>
+			</h:form>
+		</p:dialog>
+
+		<!-- END MODAL -->
+
+	</ui:define>
+
+</ui:composition>
