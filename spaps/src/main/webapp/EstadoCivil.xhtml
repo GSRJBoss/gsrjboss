@@ -48,14 +48,14 @@
 									styleClass="btn btn-primary ion-edit"
 									rendered="#{estadoCivilController.modificar}"
 									style="height:31px; padding:center"
-									update=":formBotonesHeader,:formReg,formGrowl:msgs1"
-									action="#{estadoCivilController.modificar()}">
+									update=":formBotonesHeader,:formReg,formGrowl:msgs1,:formTableEstadoCivil"
+									action="#{estadoCivilController.actualizar()}">
 								</p:commandLink>
 								<p:commandLink id="buttonEliminar" value="&#160; Eliminar"
 									styleClass="btn btn-danger ion-close"
 									style="height:31px; padding:center"
 									rendered="#{estadoCivilController.modificar}"
-									update=":formBotonesHeader,:formReg,formGrowl:msgs1"
+									update=":formBotonesHeader,:formReg,formGrowl:msgs1,:formTableEstadoCivil"
 									action="#{estadoCivilController.eliminar()}">
 								</p:commandLink>
 							</div>
@@ -72,7 +72,7 @@
 								<div class="col-md-4">
 									<div class="panel panel-default">
 										<div class="panel-heading">
-											<h3 class="panel-title">Registro de Usuario</h3>
+											<h3 class="panel-title">Registro de Estado Civil</h3>
 										</div>
 										<div class="panel-body">
 											<!-- start here register -->
@@ -95,9 +95,7 @@
 														<h:selectOneMenu id="estado"
 															styleClass="input-sm form-control"
 															style=" color: #555555; height:25px; font-size:11px;"
-															disabled="#{estadoCivilController.estadoCivil.estado =='SU'}"
-															immediate="true"
-															value="#{estadoCivilController.estadoCivil.estado}">
+															immediate="true" value="#{estadoCivilController.estado}">
 															<f:ajax />
 															<f:selectItems
 																value="#{estadoCivilController.listEstado}" />
@@ -112,16 +110,18 @@
 								</div>
 							</ui:fragment>
 						</h:form>
-						<h:form id="formTableEC">
-							<ui:fragment rendered="#{estadioController.crear}">
+					</div>
+					<div>
+						<h:form id="formTableEstadoCivil">
+							<ui:fragment rendered="true">
 								<div class="col-md-12">
 									<div class="panel panel-default">
 										<div class="panel-heading">
 											<h3 class="panel-title">Lista Estados Civiles</h3>
 										</div>
 										<!-- start here datatable -->
-										<p:dataTable id="dataTableEC" var="item"
-											widgetVar="servicioTable"
+										<p:dataTable id="dataTableEstadoCivil" var="item"
+											widgetVar="EstadoCivilTable"
 											value="#{estadoCivilController.listaEstadoCivil}"
 											selectionMode="single"
 											style="font-size: 12px !important; line-height: 1.33846154 !important; font-family: sans-serif !important;"
@@ -131,7 +131,7 @@
 
 											<p:ajax event="rowSelect"
 												listener="#{estadoCivilController.onRowSelect}"
-												update=":formReg,:formBotonesHeader,:formTableEC" />
+												update=":formReg,:formBotonesHeader,:formTableEstadoCivil" />
 
 											<p:column width="8%" headerText="Identificador"
 												filterStyle="width: 100%; height:25px;"
@@ -143,11 +143,6 @@
 												filterBy="#{item.descripcion}">
 												<h:outputText value="#{item.descripcion}" />
 											</p:column>
-											<p:column headerText="Precio"
-												filterStyle="width: 100%; height:25px;"
-												filterBy="#{item.precioUnitario}">
-												<h:outputText value="#{item.precioUnitario}" />
-											</p:column>
 											<p:column width="10%" filterStyle="width: 100%; height:25px;"
 												headerText="Estado" style="text-align:center;"
 												filterBy="#{item.estado}">
@@ -157,11 +152,11 @@
 														rendered="#{item.estado=='IN'}" value="Inactivo" /></span>
 											</p:column>
 											<p:column width="10%" filterStyle="width: 100%; height:25px;"
-												style="text-align:center;" headerText="Usuario Reg."
+												style="text-align:center;" headerText="Usuario Registro"
 												filterBy="#{item.usuarioRegistro}">
 												<h:outputText value="#{item.usuarioRegistro}" />
 											</p:column>
-											<p:column width="10%" headerText="Fecha Reg."
+											<p:column width="10%" headerText="Fecha Registro"
 												style="text-align:center;"
 												filterStyle="width: 100%; height:25px;"
 												filterBy="#{item.fechaRegistro}">
@@ -171,7 +166,7 @@
 											</p:column>
 											<f:facet name="footer">
 												<h:outputText
-													value="#{servicioController.listaServicio.size()} Registros en Total" />
+													value="#{estadoCivilController.listaEstadoCivil.size()} Registros en Total" />
 											</f:facet>
 										</p:dataTable>
 

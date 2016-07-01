@@ -4,6 +4,7 @@
 package bo.com.spaps.controller;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
@@ -56,6 +57,7 @@ public class EstadoCivilController implements Serializable {
 	private boolean modificar = false;
 	private boolean registrar = false;
 	private boolean crear = true;
+	private String estado;
 
 	// columnas
 	private String tipoColumnRegistro = "col-md-4"; // 4
@@ -150,12 +152,25 @@ public class EstadoCivilController implements Serializable {
 		this.listEstado = listEstado;
 	}
 
+	public String getEstado() {
+		return estado;
+	}
+
+	public void setEstado(String estado) {
+		this.estado = estado;
+	}
+
 	@PostConstruct
 	public void initNew() {
 		initConversation();
 		estadoCivil = new EstadoCivil();
 		estadoCivilSelected = new EstadoCivil();
+		estado = "";
 		// sucursalLogin = sessionMain.getSucursalLogin();
+		listaEstadoCivil = new ArrayList<>();
+		listaEstadoCivil = estadoCivilDao.obtenerEstadoCivilOrdenAscPorId();
+		System.out.println("lista de estados civiles tiene: "
+				+ listaEstadoCivil.size());
 		setCrear(true);
 		setModificar(false);
 		setRegistrar(false);
@@ -163,8 +178,11 @@ public class EstadoCivilController implements Serializable {
 
 	public void Init() {
 		initConversation();
+		estado = "";
 		estadoCivil = new EstadoCivil();
 		estadoCivilSelected = new EstadoCivil();
+		listaEstadoCivil = new ArrayList<>();
+		listaEstadoCivil = estadoCivilDao.obtenerEstadoCivilOrdenAscPorId();
 		// sucursalLogin = sessionMain.getSucursalLogin();
 		setCrear(true);
 		setModificar(false);
@@ -239,6 +257,13 @@ public class EstadoCivilController implements Serializable {
 				estadoCivil.setFechaModificacion(new Date());
 				estadoCivil.setUsuarioRegistro(sessionMain.getUsuarioLogin()
 						.getId());
+				System.out.println(getEstado());
+				if (getEstado().equals("ACTIVO")) {
+					estadoCivil.setEstado("AC");
+				} else {
+					estadoCivil.setEstado("IN");
+				}
+				System.out.println(estadoCivil.getEstado());
 				EstadoCivil r = estadoCivilDao.modificar(estadoCivil);
 				if (r != null) {
 					FacesUtil.infoMessage("EstadoCivil actualizado",
@@ -292,8 +317,9 @@ public class EstadoCivilController implements Serializable {
 		crear = false;
 		registrar = false;
 		modificar = true;
+		estadoCivil = estadoCivilSelected;
 		tipoColumnTable = "col-md-8";
-		resetearFitrosTabla("formTableEC:dataTableEC");
+		resetearFitrosTabla("formTableEstadoCivil:dataTableEstadoCivil");
 	}
 
 	public void resetearFitrosTabla(String id) {

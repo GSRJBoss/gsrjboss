@@ -70,15 +70,11 @@ public class EstadoCivilDao extends
 
 	public boolean eliminar(EstadoCivil EstadoCivil) {
 		try {
-			beginTransaction();
+			EstadoCivil.setEstado("IN");
 			EstadoCivil bar = modificar(EstadoCivil);
-			commitTransaction();
-			FacesUtil.infoMessage("Eliminación Correcta", "EstadoCivil "
-					+ EstadoCivil.getDescripcion());
 			return bar != null ? true : false;
 		} catch (Exception e) {
 			FacesUtil.errorMessage("Error al eliminar");
-			rollbackTransaction();
 			return false;
 		}
 	}

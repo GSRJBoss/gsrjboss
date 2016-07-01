@@ -57,7 +57,7 @@ public class SessionMain implements Serializable {
 	}
 
 	public Usuario validarUsuario_(String login, String password) {
-//		return usuarioDao.findByLogin(login, password);
+		// return usuarioDao.findByLogin(login, password);
 		return null;
 	}
 
@@ -179,7 +179,7 @@ public class SessionMain implements Serializable {
 	}
 
 	public Usuario PruebaUsuario() {
-		return usuarioDao.obtenerUsuarioId(2);		
+		return usuarioDao.obtenerUsuario(2);
 	}
 
 	public Sucursal PruebaSucursal() {
