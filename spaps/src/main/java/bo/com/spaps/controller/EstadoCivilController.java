@@ -15,6 +15,9 @@ import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.primefaces.component.datatable.DataTable;
+import org.primefaces.event.SelectEvent;
+
 import bo.com.spaps.dao.EstadoCivilDao;
 import bo.com.spaps.dao.SessionMain;
 import bo.com.spaps.model.EstadoCivil;
@@ -187,17 +190,21 @@ public class EstadoCivilController implements Serializable {
 				System.out.println("entro a registrar else");
 				// estadoCivil.setCompania(getSucursal().getCompania());
 				// estadoCivil.setSucursal(getSucursal());
-				System.out.println("Sucursal : "+ sessionMain.PruebaSucursal().getDescripcion());
+				System.out.println("Sucursal : "
+						+ sessionMain.PruebaSucursal().getDescripcion());
 				estadoCivil.setSucursal(sessionMain.PruebaSucursal());
-				estadoCivil.setCompania(estadoCivil.getSucursal().getCompania());
-				System.out.println("compania : "+ estadoCivil.getCompania().getDescripcion());
+				estadoCivil
+						.setCompania(estadoCivil.getSucursal().getCompania());
+				System.out.println("compania : "
+						+ estadoCivil.getCompania().getDescripcion());
 				estadoCivil.setFechaRegistro(new Date());
 				estadoCivil
 						.setFechaModificacion(estadoCivil.getFechaRegistro());
 				// estadoCivil.setUsuarioRegistro(sessionMain.getUsuarioLogin().getId());
 				estadoCivil.setUsuarioRegistro(sessionMain.PruebaUsuario()
 						.getId());
-				System.out.println("usuario : "+ estadoCivil.getUsuarioRegistro());
+				System.out.println("usuario : "
+						+ estadoCivil.getUsuarioRegistro());
 				EstadoCivil r = estadoCivilDao.registrar(estadoCivil);
 				if (r != null) {
 					FacesUtil.infoMessage("EstadoCivil registrado",
@@ -279,6 +286,21 @@ public class EstadoCivilController implements Serializable {
 			System.out.println(">>>>>>>>>> CONVERSACION TERMINADA...");
 		}
 		return "kardex_producto.xhtml?faces-redirect=true";
+	}
+
+	public void onRowSelect(SelectEvent event) {
+		crear = false;
+		registrar = false;
+		modificar = true;
+		tipoColumnTable = "col-md-8";
+		resetearFitrosTabla("formTableEC:dataTableEC");
+	}
+
+	public void resetearFitrosTabla(String id) {
+		DataTable table = (DataTable) FacesContext.getCurrentInstance()
+				.getViewRoot().findComponent(id);
+		table.setSelection(null);
+		table.reset();
 	}
 
 }
