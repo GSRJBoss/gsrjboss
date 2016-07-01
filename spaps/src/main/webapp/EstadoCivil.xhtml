@@ -41,14 +41,14 @@
 									styleClass="btn btn-success ion-checkmark"
 									style="height:31px; padding:center"
 									rendered="#{estadoCivilController.registrar}"
-									update=":formBotonesHeader,:formReg,formGrowl:msgs1"
+									update=":formBotonesHeader,:formReg,formGrowl:msgs1,formTableEstadoCivil"
 									action="#{estadoCivilController.registrar()}">
 								</p:commandLink>
 								<p:commandLink id="buttonModificar" value="&#160; Modificar"
 									styleClass="btn btn-primary ion-edit"
 									rendered="#{estadoCivilController.modificar}"
 									style="height:31px; padding:center"
-									update=":formBotonesHeader,:formReg,formGrowl:msgs1,:formTableEstadoCivil"
+									update=":formBotonesHeader,:formReg,formGrowl:msgs1,:formTableEstadoCivil,:formReg:estado"
 									action="#{estadoCivilController.actualizar()}">
 								</p:commandLink>
 								<p:commandLink id="buttonEliminar" value="&#160; Eliminar"
@@ -96,9 +96,9 @@
 															styleClass="input-sm form-control"
 															style=" color: #555555; height:25px; font-size:11px;"
 															immediate="true" value="#{estadoCivilController.estado}">
-															<f:ajax />
 															<f:selectItems
 																value="#{estadoCivilController.listEstado}" />
+															<f:ajax event="change" update=":formReg" />
 														</h:selectOneMenu>
 													</div>
 												</div>

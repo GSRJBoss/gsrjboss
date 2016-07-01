@@ -51,13 +51,13 @@ public class EstadoCivilController implements Serializable {
 
 	/******* LIST **********/
 	private List<EstadoCivil> listaEstadoCivil;
-	private String[] listEstado = { "ACTIVO", "INACTIVO" };
+	private List<String> listEstado = new ArrayList<>();
 
 	/******* ESTADOS **********/
 	private boolean modificar = false;
 	private boolean registrar = false;
 	private boolean crear = true;
-	private String estado;
+	private String estado = "";
 
 	// columnas
 	private String tipoColumnRegistro = "col-md-4"; // 4
@@ -144,11 +144,11 @@ public class EstadoCivilController implements Serializable {
 		this.tipoColumnTable = tipoColumnTable;
 	}
 
-	public String[] getListEstado() {
+	public List<String> getListEstado() {
 		return listEstado;
 	}
 
-	public void setListEstado(String[] listEstado) {
+	public void setListEstado(List<String> listEstado) {
 		this.listEstado = listEstado;
 	}
 
@@ -160,12 +160,21 @@ public class EstadoCivilController implements Serializable {
 		this.estado = estado;
 	}
 
+	public void CargarEstados() {
+		getListEstado().add("ACTIVO");
+		getListEstado().add("INACTIVO");
+	}
+
+	public void menu() {
+		FacesUtil.infoMessage("VALIDACION", getEstado());
+	}
+
 	@PostConstruct
 	public void initNew() {
 		initConversation();
 		estadoCivil = new EstadoCivil();
 		estadoCivilSelected = new EstadoCivil();
-		estado = "";
+		CargarEstados();
 		// sucursalLogin = sessionMain.getSucursalLogin();
 		listaEstadoCivil = new ArrayList<>();
 		listaEstadoCivil = estadoCivilDao.obtenerEstadoCivilOrdenAscPorId();
@@ -178,10 +187,8 @@ public class EstadoCivilController implements Serializable {
 
 	public void Init() {
 		initConversation();
-		estado = "";
 		estadoCivil = new EstadoCivil();
 		estadoCivilSelected = new EstadoCivil();
-		listaEstadoCivil = new ArrayList<>();
 		listaEstadoCivil = estadoCivilDao.obtenerEstadoCivilOrdenAscPorId();
 		// sucursalLogin = sessionMain.getSucursalLogin();
 		setCrear(true);
@@ -227,10 +234,10 @@ public class EstadoCivilController implements Serializable {
 				if (r != null) {
 					FacesUtil.infoMessage("EstadoCivil registrado",
 							r.toString());
-					initNew();
+					Init();
 				} else {
 					FacesUtil.errorMessage("Error al registrar");
-					initNew();
+					Init();
 				}
 			}
 		} catch (Exception e) {
@@ -258,20 +265,22 @@ public class EstadoCivilController implements Serializable {
 				estadoCivil.setUsuarioRegistro(sessionMain.getUsuarioLogin()
 						.getId());
 				System.out.println(getEstado());
+				FacesUtil.infoMessage("Estado", getEstado());
 				if (getEstado().equals("ACTIVO")) {
 					estadoCivil.setEstado("AC");
 				} else {
-					estadoCivil.setEstado("IN");
+					if (getEstado().equals("INACTIVO"))
+						estadoCivil.setEstado("IN");
 				}
 				System.out.println(estadoCivil.getEstado());
 				EstadoCivil r = estadoCivilDao.modificar(estadoCivil);
 				if (r != null) {
 					FacesUtil.infoMessage("EstadoCivil actualizado",
 							r.toString());
-					initNew();
+					Init();
 				} else {
 					FacesUtil.errorMessage("Error al actualizar");
-					initNew();
+					Init();
 				}
 			}
 		} catch (Exception e) {
@@ -286,10 +295,10 @@ public class EstadoCivilController implements Serializable {
 			if (estadoCivilDao.eliminar(estadoCivil)) {
 				FacesUtil.infoMessage("EstadoCivil Eliminado",
 						estadoCivil.toString());
-				initNew();
+				Init();
 			} else {
 				FacesUtil.errorMessage("Error al eliminar");
-				initNew();
+				Init();
 			}
 		} catch (Exception e) {
 			System.out.println("Error en eliminacion de estadoCivil: "
