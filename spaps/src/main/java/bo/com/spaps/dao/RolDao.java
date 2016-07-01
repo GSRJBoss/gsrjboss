@@ -8,6 +8,7 @@ import java.util.List;
 import javax.ejb.Stateless;
 
 import bo.com.spaps.model.Rol;
+import bo.com.spaps.model.Usuario;
 import bo.com.spaps.util.E;
 import bo.com.spaps.util.FacesUtil;
 import bo.com.spaps.util.O;
@@ -112,5 +113,7 @@ public class RolDao extends DataAccessObjectJpa<Rol, E, R, S, O, P, Q, U, V, W> 
 	public List<Rol> obtenerRolOrdenDescPorId() {
 		return findDescAllOrderedByParameter("id");
 	}
+	
+	
 
 }

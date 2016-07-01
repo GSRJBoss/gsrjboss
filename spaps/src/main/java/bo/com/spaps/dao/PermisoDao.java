@@ -8,6 +8,7 @@ import java.util.List;
 import javax.ejb.Stateless;
 
 import bo.com.spaps.model.Permiso;
+import bo.com.spaps.model.Rol;
 import bo.com.spaps.util.E;
 import bo.com.spaps.util.FacesUtil;
 import bo.com.spaps.util.O;
@@ -117,6 +118,10 @@ public class PermisoDao extends
 
 	public List<Permiso> obtenerPermisoOrdenDescPorId() {
 		return findDescAllOrderedByParameter("id");
+	}
+	
+	public List<Permiso> obtenerPorRol(Rol rol) {
+		return findAllActiveParameter("rol", rol.getId());
 	}
 
 }

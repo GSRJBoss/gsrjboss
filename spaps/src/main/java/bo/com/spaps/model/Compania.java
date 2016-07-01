@@ -31,6 +31,13 @@ public class Compania implements Serializable {
 	@Size(max = 255)
 	@Column(name = "telefono", nullable = true)
 	private String telefono;
+	
+	@Column(name = "foto_perfil", nullable = true)
+	private byte[] fotoPerfil;
+	
+	@Column(name = "peso_foto", nullable = true)
+	private int pesoFoto;
+	
 	@Size(max = 2)
 	@Column(name = "estado", nullable = false)
 	// AC , IN , RM
@@ -153,6 +160,22 @@ public class Compania implements Serializable {
 				}
 			}
 		}
+	}
+
+	public int getPesoFoto() {
+		return pesoFoto;
+	}
+
+	public void setPesoFoto(int pesoFoto) {
+		this.pesoFoto = pesoFoto;
+	}
+
+	public byte[] getFotoPerfil() {
+		return fotoPerfil;
+	}
+
+	public void setFotoPerfil(byte[] fotoPerfil) {
+		this.fotoPerfil = fotoPerfil;
 	}
 
 }

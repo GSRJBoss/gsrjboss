@@ -57,8 +57,8 @@ public class SessionMain implements Serializable {
 	}
 
 	public Usuario validarUsuario_(String login, String password) {
-		// return usuarioDao.findByLogin(login, password);
-		return null;
+		return usuarioDao.login(login, password);
+
 	}
 
 	/**
@@ -167,12 +167,12 @@ public class SessionMain implements Serializable {
 	}
 
 	public Sucursal getSucursalLogin() {
-		if (getSucursalLogin() == null) {
+		if (sucursalLogin == null) {
 			try {
-				// setSucursalLogin(sucursalDao.obtenerSucursal());
+				sucursalLogin = sucursalDao.obtenerSucursal(1);
 			} catch (Exception e) {
-				setSucursalLogin(null);
-				// log.error("getEmpresaLoggin() ERROR: " + e.getMessage());
+				sucursalLogin = null;
+				System.out.println("getSucursalLogin() ERROR: " + e.getMessage());
 			}
 		}
 		return sucursalLogin;

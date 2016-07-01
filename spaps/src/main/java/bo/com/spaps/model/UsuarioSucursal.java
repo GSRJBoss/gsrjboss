@@ -12,8 +12,8 @@ import javax.validation.constraints.Size;
  *
  */
 @Entity
-@Table(name = "usuario_compania", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = "id"))
-public class UsuarioCompania implements Serializable {
+@Table(name = "usuario_sucursal", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = "id"))
+public class UsuarioSucursal implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,7 +37,7 @@ public class UsuarioCompania implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public UsuarioCompania() {
+	public UsuarioSucursal() {
 		super();
 		this.id = 0;
 		this.usuario = new Usuario();
@@ -119,10 +119,10 @@ public class UsuarioCompania implements Serializable {
 		if (obj == null) {
 			return false;
 		} else {
-			if (!(obj instanceof UsuarioCompania)) {
+			if (!(obj instanceof UsuarioSucursal)) {
 				return false;
 			} else {
-				if (((UsuarioCompania) obj).id == this.id) {
+				if (((UsuarioSucursal) obj).id == this.id) {
 					return true;
 				} else {
 					return false;

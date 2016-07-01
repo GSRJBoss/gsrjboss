@@ -20,7 +20,7 @@ import bo.com.spaps.dao.UsuarioDao;
 import bo.com.spaps.model.Rol;
 import bo.com.spaps.model.Sucursal;
 import bo.com.spaps.model.Usuario;
-import bo.com.spaps.model.UsuarioCompania;
+import bo.com.spaps.model.UsuarioSucursal;
 import bo.com.spaps.util.FacesUtil;
 
 @Named("usuarioController")
@@ -48,7 +48,7 @@ public class UsuarioController implements Serializable {
 
 	/******* LIST **********/
 	private List<Usuario> listaUsuario;
-	private List<UsuarioCompania> companias;
+	private List<UsuarioSucursal> companias;
 
 	/******* ESTADOS **********/
 	private boolean modificar = false;
@@ -120,11 +120,11 @@ public class UsuarioController implements Serializable {
 		this.crear = crear;
 	}
 
-	public List<UsuarioCompania> getCompanias() {
+	public List<UsuarioSucursal> getCompanias() {
 		return companias;
 	}
 
-	public void setCompanias(List<UsuarioCompania> companias) {
+	public void setCompanias(List<UsuarioSucursal> companias) {
 		this.companias = companias;
 	}
 

@@ -29,6 +29,7 @@ public class Permiso implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "id_rol", nullable = false)
 	private Rol rol;
+	
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "id_menu_accion", nullable = false)
 	private MenuAccion menuAccion;

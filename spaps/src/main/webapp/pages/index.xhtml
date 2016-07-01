@@ -8,7 +8,7 @@
 	xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
 	template="/WEB-INF/templates/template_index.xhtml">
 	<ui:define name="head">
-		<title>Empresa - Gestión</title>
+		<title>Compania - Gestión</title>
 	</ui:define>
 
 	<ui:define name="content">
@@ -20,14 +20,14 @@
 				<div class="pull-right">
 					<ol class="breadcrumb">
 						<li class="active" style="font-size: 12px;">SELECCION DE
-							EMPRESA - GESTION</li>
+							Compania - GESTION</li>
 					</ol>
 				</div>
 			</section>
 			<section class="main-content">
 				<section class="main-content">
 					<div class="row">
-						<h:form id="formTableEmpresaGestion">
+						<h:form id="formTableCompaniaGestion">
 							<ui:fragment rendered="#{creacionController.seleccionarForm1}">
 								<div class="col-md-8">
 									<div class="panel panel-default">
@@ -58,52 +58,37 @@
 											<!-- start here register -->
 											<div class="row">
 												<div class="col-md-12 box-content form-horizontal">
-													<p:dataTable id="dataTableEmpresa" var="item"
-														rendered="#{creacionController.seleccionadaFormEmpresa}"
-														value="#{creacionController.listaEmpresaActivas}"
+													<p:dataTable id="dataTableCompania" var="item"
+														rendered="#{creacionController.seleccionadaFormCompania}"
+														value="#{creacionController.listaCompaniaActivas}"
 														selectionMode="single"
-														selection="#{creacionController.selectedEmpresa}"
+														selection="#{creacionController.selectedCompania}"
 														style="font-size: 12px !important; line-height: 1.33846154 !important; font-family: sans-serif !important;"
 														rowKey="#{item.id}">
 														<f:facet name="header">
            													SELECCIONA UNA EMPRESA
         												</f:facet>
 														<p:ajax event="rowSelect"
-															listener="#{creacionController.onRowSelectEmpresa2}"
-															update="formTableEmpresaGestion" />
+															listener="#{creacionController.onRowSelectCompania2}"
+															update="formTableCompaniaGestion" />
 														<p:column headerText="Detalle" style="color: #555555;">
-															<h:outputText value="#{item.razonSocial}" />
+															<h:outputText value="#{item.descripcion}" />
 														</p:column>
 														<p:column headerText="Gestión"
 															style="color: #555555; text-align:center;">
 															<h:outputText value="2016" />
 														</p:column>
 													</p:dataTable>
-													<p:dataTable id="dataTableGestion" var="item"
-														value="#{creacionController.listaGestion}"
-														rendered="false" selectionMode="single"
-														style="font-size: 12px !important; line-height: 1.33846154 !important; font-family: sans-serif !important;"
-														selection="#{creacionController.selectedGestion}"
-														rowKey="#{item.id}">
-														<f:facet name="header">
-           													SELECCIONE UNA GESTION
-        												</f:facet>
-														<p:ajax event="rowSelect"
-															listener="#{creacionController.onRowSelectGestion}"
-															update="formTableEmpresaGestion" />
-														<p:column headerText="Detalle" style="color: #555555;">
-															<h:outputText value="#{item.gestion}" />
-														</p:column>
-													</p:dataTable>
+													
 												</div>
 											</div>
 											<br />
 											<div class="row">
 												<div class="col-md-12">
-													<p:commandLink id="buttonAgregarEmpresa"
-														value="Nueva Empresa"
+													<p:commandLink id="buttonAgregarCompania"
+														value="Nueva Compania"
 														styleClass="btn btn-primary btn-block"
-														rendered="#{creacionController.seleccionadaFormAgregarEmpresa}"
+														rendered="#{creacionController.seleccionadaFormAgregarCompania}"
 														onclick="location.href='#{request.contextPath}/pages/index_.xhtml'">
 													</p:commandLink>
 												</div>
@@ -113,7 +98,7 @@
 												<div class="col-md-12">
 													<p:commandLink id="buttonOtraGestion"
 														value="Acceder con otra gestión."
-														rendered="#{creacionController.seleccionadaFormAgregarEmpresa}"
+														rendered="#{creacionController.seleccionadaFormAgregarCompania}"
 														oncomplete="PF('dlg1').show();">
 													</p:commandLink>
 												</div>
@@ -123,7 +108,7 @@
 													<p:commandLink id="buttonAtras" value="Atras"
 														rendered="#{creacionController.seleccionadaFormGestion}"
 														styleClass="btn btn-warning btn-block">
-														<p:ajax update="formTableEmpresaGestion"
+														<p:ajax update="formTableCompaniaGestion"
 															listener="#{creacionController.formButtonAtras()}" />
 													</p:commandLink>
 												</div>
