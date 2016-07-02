@@ -70,15 +70,11 @@ public class RazaDao extends
 
 	public boolean eliminar(Raza Raza) {
 		try {
-			beginTransaction();
+			Raza.setEstado("RM");
 			Raza bar = modificar(Raza);
-			commitTransaction();
-			FacesUtil.infoMessage("Eliminación Correcta",
-					"Raza " + Raza.getNombre());
 			return bar != null ? true : false;
 		} catch (Exception e) {
 			FacesUtil.errorMessage("Error al eliminar");
-			rollbackTransaction();
 			return false;
 		}
 	}

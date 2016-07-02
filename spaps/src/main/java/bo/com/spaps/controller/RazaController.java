@@ -14,6 +14,9 @@ import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.primefaces.component.datatable.DataTable;
+import org.primefaces.event.SelectEvent;
+
 import bo.com.spaps.dao.RazaDao;
 import bo.com.spaps.dao.SessionMain;
 import bo.com.spaps.model.Raza;
@@ -44,11 +47,13 @@ public class RazaController implements Serializable {
 
 	/******* LIST **********/
 	private List<Raza> listaRaza;
+	private String[] listaEstado = { "ACTIVO", "INACTIVO" };
 
 	/******* ESTADOS **********/
 	private boolean modificar = false;
 	private boolean registrar = false;
 	private boolean crear = true;
+	private String estado = "AC";
 
 	@Inject
 	Conversation conversation;
@@ -115,11 +120,49 @@ public class RazaController implements Serializable {
 		this.crear = crear;
 	}
 
+	public String[] getListaEstado() {
+		return listaEstado;
+	}
+
+	public String getEstado() {
+		return estado;
+	}
+
+	public void setListaEstado(String[] listaEstado) {
+		this.listaEstado = listaEstado;
+	}
+
+	public void setEstado(String estado) {
+		this.estado = estado;
+	}
+
+	public void cambiarAspecto() {
+		crear = false;
+		registrar = true;
+		modificar = false;
+	}
+
+	public void onRowSelect(SelectEvent event) {
+		crear = false;
+		registrar = false;
+		modificar = true;
+		raza = razaSelected;
+		resetearFitrosTabla("formTableRaza:dataTableRaza");
+	}
+
+	public void resetearFitrosTabla(String id) {
+		DataTable table = (DataTable) FacesContext.getCurrentInstance()
+				.getViewRoot().findComponent(id);
+		table.setSelection(null);
+		table.reset();
+	}
+
 	@PostConstruct
 	public void initNew() {
 		raza = new Raza();
 		razaSelected = new Raza();
 		sucursalLogin = sessionMain.getSucursalLogin();
+		listaRaza = razaDao.obtenerRazaOrdenAscPorId();
 		setCrear(true);
 		setModificar(false);
 		setRegistrar(false);
@@ -129,18 +172,26 @@ public class RazaController implements Serializable {
 		try {
 			if (raza.getCodigo().trim().isEmpty()
 					|| raza.getNombre().trim().isEmpty()
-					|| raza.getEstado().trim().isEmpty()
-					|| getSucursal() == null
-					|| getSucursal().getCompania() == null) {
+			/*
+			 * || raza.getEstado().trim().isEmpty() || getSucursal() == null ||
+			 * getSucursal().getCompania() == null
+			 */) {
 				FacesUtil.infoMessage("VALIDACION",
 						"No puede haber campos vacíos");
 				return;
 			} else {
-				raza.setCompania(getSucursal().getCompania());
-				raza.setSucursal(getSucursal());
+				/*
+				 * raza.setCompania(getSucursal().getCompania());
+				 * raza.setSucursal(getSucursal());
+				 * raza.setUsuarioRegistro(sessionMain
+				 * .getUsuarioLogin().getId());
+				 */
+				raza.setUsuarioRegistro(sessionMain.PruebaUsuario().getId());
+				raza.setSucursal(sessionMain.PruebaSucursal());
+				raza.setCompania(raza.getSucursal().getCompania());
+				raza.setEstado("AC");
 				raza.setFechaRegistro(new Date());
 				raza.setFechaModificacion(raza.getFechaRegistro());
-				raza.setUsuarioRegistro(sessionMain.getUsuarioLogin().getId());
 				Raza r = razaDao.registrar(raza);
 				if (r != null) {
 					FacesUtil.infoMessage("Raza registrado", r.toString());
@@ -160,17 +211,27 @@ public class RazaController implements Serializable {
 		try {
 			if (raza.getCodigo().trim().isEmpty()
 					|| raza.getNombre().trim().isEmpty()
-					|| raza.getEstado().trim().isEmpty()
-					|| getSucursal() == null
-					|| getSucursal().getCompania() == null) {
+			/*
+			 * || raza.getEstado().trim().isEmpty() || getSucursal() == null ||
+			 * getSucursal().getCompania() == null
+			 */) {
 				FacesUtil.infoMessage("VALIDACION",
 						"No puede haber campos vacíos");
 				return;
 			} else {
-				raza.setCompania(getSucursal().getCompania());
-				raza.setSucursal(getSucursal());
+				/*
+				 * raza.setCompania(getSucursal().getCompania());
+				 * raza.setSucursal(getSucursal());
+				 */
 				raza.setFechaModificacion(new Date());
-				raza.setUsuarioRegistro(sessionMain.getUsuarioLogin().getId());
+				raza.setUsuarioRegistro(sessionMain.PruebaUsuario().getId());
+				raza.setEstado(getEstado());
+				if (getEstado().equals("ACTIVO")) {
+					raza.setEstado("AC");
+				} else {
+					if (getEstado().equals("INACTIVO"))
+						raza.setEstado("IN");
+				}
 				Raza r = razaDao.modificar(raza);
 				if (r != null) {
 					FacesUtil.infoMessage("Raza actualizado", r.toString());

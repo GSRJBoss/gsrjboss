@@ -70,15 +70,11 @@ public class DocumentoIdentidadDao extends
 
 	public boolean eliminar(DocumentoIdentidad DocumentoIdentidad) {
 		try {
-			beginTransaction();
+			DocumentoIdentidad.setEstado("RM");
 			DocumentoIdentidad bar = modificar(DocumentoIdentidad);
-			commitTransaction();
-			FacesUtil.infoMessage("Eliminación Correcta", "DocumentoIdentidad "
-					+ DocumentoIdentidad.getNombre());
 			return bar != null ? true : false;
 		} catch (Exception e) {
 			FacesUtil.errorMessage("Error al eliminar");
-			rollbackTransaction();
 			return false;
 		}
 	}

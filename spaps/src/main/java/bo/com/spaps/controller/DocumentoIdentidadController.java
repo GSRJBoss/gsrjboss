@@ -14,10 +14,14 @@ import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.primefaces.component.datatable.DataTable;
+import org.primefaces.event.SelectEvent;
+
 import bo.com.spaps.dao.DocumentoIdentidadDao;
 import bo.com.spaps.dao.SessionMain;
 import bo.com.spaps.model.DocumentoIdentidad;
 import bo.com.spaps.model.Sucursal;
+import bo.com.spaps.model.Usuario;
 import bo.com.spaps.util.FacesUtil;
 
 @Named("documentoIdentidadController")
@@ -41,14 +45,17 @@ public class DocumentoIdentidadController implements Serializable {
 	private DocumentoIdentidad documentoIdentidad;
 	private DocumentoIdentidad documentoIdentidadSelected;
 	private Sucursal sucursalLogin;
+	private Usuario usuario;
 
 	/******* LIST **********/
 	private List<DocumentoIdentidad> listaDocumentoIdentidad;
+	private String[] listaEstado = { "ACTIVO", "INACTIVO" };
 
 	/******* ESTADOS **********/
 	private boolean modificar = false;
 	private boolean registrar = false;
 	private boolean crear = true;
+	private String estado = "AC";
 
 	@Inject
 	Conversation conversation;
@@ -117,35 +124,105 @@ public class DocumentoIdentidadController implements Serializable {
 		this.sucursalLogin = sucursalLogin;
 	}
 
+	public String[] getListaEstado() {
+		return listaEstado;
+	}
+
+	public String getEstado() {
+		return estado;
+	}
+
+	public void setListaEstado(String[] listaEstado) {
+		this.listaEstado = listaEstado;
+	}
+
+	public void setEstado(String estado) {
+		this.estado = estado;
+	}
+
+	public Usuario getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
+	}
+
 	@PostConstruct
 	public void initNew() {
 		documentoIdentidad = new DocumentoIdentidad();
 		documentoIdentidadSelected = new DocumentoIdentidad();
-		sucursalLogin = sessionMain.getSucursalLogin();
+		listaDocumentoIdentidad = documentoIdentidadDao
+				.obtenerDocumentoIdentidadOrdenAscPorId();
+		// usuario = sessionMain.getUsuarioLogin();
+		// sucursalLogin = sessionMain.getSucursalLogin();
 		setCrear(true);
 		setModificar(false);
 		setRegistrar(false);
+	}
+
+	public void Init() {
+		documentoIdentidad = new DocumentoIdentidad();
+		documentoIdentidadSelected = new DocumentoIdentidad();
+		listaDocumentoIdentidad = documentoIdentidadDao
+				.obtenerDocumentoIdentidadOrdenAscPorId();
+		// sucursalLogin = sessionMain.getSucursalLogin();
+		setCrear(true);
+		setModificar(false);
+		setRegistrar(false);
+	}
+
+	public void cambiarAspecto() {
+		crear = false;
+		registrar = true;
+		modificar = false;
+	}
+
+	public void onRowSelect(SelectEvent event) {
+		crear = false;
+		registrar = false;
+		modificar = true;
+		documentoIdentidad = documentoIdentidadSelected;
+		resetearFitrosTabla("formTableDocumentoIdentidad:dataTableDocumentoIdentidad");
+	}
+
+	public void resetearFitrosTabla(String id) {
+		DataTable table = (DataTable) FacesContext.getCurrentInstance()
+				.getViewRoot().findComponent(id);
+		table.setSelection(null);
+		table.reset();
 	}
 
 	public void registrar() {
 		try {
 			if (documentoIdentidad.getNombre().trim().isEmpty()
 					|| documentoIdentidad.getSigla().trim().isEmpty()
-					|| documentoIdentidad.getEstado().trim().isEmpty()
-					|| getSucursalLogin() == null
-					|| getSucursalLogin().getCompania() == null) {
+			/*
+			 * || documentoIdentidad.getEstado().trim().isEmpty() ||
+			 * getSucursalLogin() == null || getSucursalLogin().getCompania() ==
+			 * null
+			 */) {
 				FacesUtil.infoMessage("VALIDACION",
 						"No puede haber campos vacíos");
 				return;
 			} else {
-				documentoIdentidad
-						.setCompania(getSucursalLogin().getCompania());
-				documentoIdentidad.setSucursal(getSucursalLogin());
+				/*
+				 * documentoIdentidad
+				 * .setCompania(getSucursalLogin().getCompania());
+				 * documentoIdentidad.setSucursal(getSucursalLogin());
+				 * documentoIdentidad.setFechaRegistro(new Date());
+				 * documentoIdentidad.setUsuarioRegistro(sessionMain
+				 * .getUsuarioLogin().getId());
+				 */
+				documentoIdentidad.setUsuarioRegistro(sessionMain
+						.PruebaUsuario().getId());
+				documentoIdentidad.setSucursal(sessionMain.PruebaSucursal());
+				documentoIdentidad.setCompania(documentoIdentidad.getSucursal()
+						.getCompania());
+				documentoIdentidad.setEstado("AC");
 				documentoIdentidad.setFechaRegistro(new Date());
 				documentoIdentidad.setFechaModificacion(documentoIdentidad
 						.getFechaRegistro());
-				documentoIdentidad.setUsuarioRegistro(sessionMain
-						.getUsuarioLogin().getId());
 				DocumentoIdentidad r = documentoIdentidadDao
 						.registrar(documentoIdentidad);
 				if (r != null) {
@@ -168,14 +245,22 @@ public class DocumentoIdentidadController implements Serializable {
 		try {
 			if (documentoIdentidad.getNombre().trim().isEmpty()
 					|| documentoIdentidad.getSigla().trim().isEmpty()
-					|| documentoIdentidad.getEstado().trim().isEmpty()) {
+					|| getEstado().trim().isEmpty()) {
 				FacesUtil.infoMessage("VALIDACION",
 						"No puede haber campos vacíos");
 				return;
 			} else {
 				documentoIdentidad.setFechaModificacion(new Date());
 				documentoIdentidad.setUsuarioRegistro(sessionMain
-						.getUsuarioLogin().getId());
+						.PruebaUsuario().getId());
+				System.out.println(getEstado());
+				documentoIdentidad.setEstado(getEstado());
+				if (getEstado().equals("ACTIVO")) {
+					documentoIdentidad.setEstado("AC");
+				} else {
+					if (getEstado().equals("INACTIVO"))
+						documentoIdentidad.setEstado("IN");
+				}
 				DocumentoIdentidad r = documentoIdentidadDao
 						.modificar(documentoIdentidad);
 				if (r != null) {
