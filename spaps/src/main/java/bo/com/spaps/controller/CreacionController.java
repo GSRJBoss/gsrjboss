@@ -52,8 +52,8 @@ public class CreacionController implements Serializable {
 	@Inject
 	@Push(topic = PUSH_CDI_TOPIC)
 	Event<String> pushEventSucursal;
-	
-	//dao
+
+	// dao
 	private @Inject SucursalDao sucursalDao;
 
 	// ESTADOS
@@ -73,23 +73,9 @@ public class CreacionController implements Serializable {
 	private String tituloPanel = "Registrar Compania";
 	private String nombreCompania = "";
 	private String nombreEstado = "ACTIVO";
-	private String periodo = "enero-diciembre";
-	private String formTitulo = "EMPRESA";
-	private String nombreMonedaNacional;
-	private String simboloMonedaNacional;
-	private String simboloMonedaExtranjera;
-	private int nivel;
+
 	private int tamanio = 1;
 	private String codigo;
-	private String periodoActual = "enero";
-	private double tipoCambio = 6.91;
-	private double tipoCambioUfv = 2.02;
-	private String tipoPlanCuenta = "personalizado";
-	private int nivelAnterior = 0;
-	private String tabCompania = "active";
-	private String tabGestion = "";
-	private String tabPlanCuenta = "";
-	private String tabParametros = "";
 	private int numeroTab;
 
 	// SESION
@@ -100,41 +86,18 @@ public class CreacionController implements Serializable {
 	// OBJECT
 	private Compania newCompania;
 	private Compania selectedCompania;
-	private boolean seleccionadaFormEmpresa=true;
+	private boolean seleccionadaFormEmpresa = true;
 
 	// LIST
-	private String[] arrayPeriodo = { "enero-diciembre", "abril-marzo",
-			"julio-junio", "octubre-septiembre" };
 	private List<Usuario> listUsuario = new ArrayList<Usuario>();
 	private List<Compania> listaCompania;
-	private List<Compania> listaCompaniaActivas= new ArrayList<Compania>();
-	private List<UsuarioSucursal> listUsuarioSucursals= new ArrayList<UsuarioSucursal>();
+	private List<Compania> listaCompaniaActivas = new ArrayList<Compania>();
+	private List<UsuarioSucursal> listUsuarioSucursals = new ArrayList<UsuarioSucursal>();
 	private List<Compania> listFilterCompania;
 	private String[] listEstado = { "ACTIVO", "INACTIVO" };
-	private String[] arrayNivel = { "PRIMER NIVEL", "SEGUNDO NIVEL",
-			"TERCER NIVEL", "CUARTO NIVEL", "QUINTO NIVEL", "SEXTO NIVEL",
-			"SEPTIMO NIVEL", "OCTAVO NIVEL", "NOVENO NIVEL" };
-	private String[] arrayPeriodoActual = { "enero", "febrero", "marzo",
-			"abril", "mayo", "junio", "julio", "agosto", "septiembre",
-			"octubre", "noviembre", "diciembre" };
-	/*
-	 * private List<PlanCuenta> listPlanCuentaDefault = new
-	 * ArrayList<PlanCuenta>();
-	 */
-	private List<EDNivel> listNivel = new ArrayList<EDNivel>();
-	/*
-	 * private List<TipoCuenta> listDefinicionCuenta = new
-	 * ArrayList<TipoCuenta>();
-	 */
-	// 1 2 3 4 5 6 7 8 9
-	private Integer[] arrayTamanio = { 1, 2, 2, 3, 3, 3, 3, 3, 3 };
 
 	// Component Primefaces
 	private UIData usersDataTable;
-	private TreeNode selectedNode;
-
-	// treeNode
-	private TreeNode rootPC;
 
 	@PostConstruct
 	public void initNewCompania() {
@@ -153,148 +116,8 @@ public class CreacionController implements Serializable {
 		buttonAnterior = false;
 		buttonSiguiente = true;
 
-		tabCompania = "active";
-		tabGestion = "";
-		tabPlanCuenta = "";
-		tabParametros = "";
-
 		seleccionadaFormAgregarCompania = true;
-		if (listaCompaniaActivas.isEmpty()) {
-			formTitulo = "CREAR EMPRESA";
-			seleccionadaFormCompania = false;
-			seleccionadaFormGestion = false;
-			buttonCancelar = false;
-		} else {
-
-		}
-		rootPC = new DefaultTreeNode("Root", null);
 		modificar = false;
-		/*cargarPlanCuentaDefault();
-		cargarTreeNiveles();*/
-		/* definirListCuenta(); */
-	}
-
-	
-
-	// ----------------- treenode ----------------
-
-	public void cargarTreeNiveles() {
-		listNivel = new ArrayList<EDNivel>();
-		EDNivel edNivel1 = new EDNivel("1", arrayNivel[0], arrayTamanio[0]);
-		listNivel.add(edNivel1);
-		EDNivel edNivel2 = new EDNivel("2", arrayNivel[1], arrayTamanio[1]);
-		listNivel.add(edNivel2);
-		for (int i = 2; i < nivel; i++) {
-			EDNivel edNivel3 = new EDNivel(String.valueOf(i + 1),
-					arrayNivel[i], arrayTamanio[i]);
-			listNivel.add(edNivel3);
-		}
-	}
-
-	// ---------------- acciones para nivel --------------------
-
-	public void aumentarOSubir() {
-		loadVarTab();
-		if (!swNivel) {
-			return;
-		}// salir
-		if (nivel == 5) {
-			tipoPlanCuenta = "default";
-		} else {
-			tipoPlanCuenta = "personalizado";
-		}
-		if (nivelAnterior < nivel) {
-			// aumentar una codificacion al nivel aumentado
-			codigo = aumentar1Nivel();
-			int nivelAux = this.nivel;
-			EDNivel edNivel3 = new EDNivel(String.valueOf(nivelAux),
-					arrayNivel[nivelAux - 1], arrayTamanio[nivelAux - 1]);
-			listNivel.add(edNivel3);
-		} else {
-			// quitar una codificacion al nivel disminuido
-			codigo = quitar1Nivel();
-			listNivel.remove(listNivel.size() - 1);
-		}
-	}
-
-	public void loadVarTab() {
-		tabCompania = "";
-		tabGestion = "";
-		tabPlanCuenta = "active";
-		tabParametros = "";
-	}
-
-	public void loadVarTabItem(int item) {
-		tabCompania = "";
-		tabGestion = "";
-		tabPlanCuenta = "";
-		tabParametros = "";
-		switch (item) {
-		case 1:
-			tabCompania = "active";
-			break;
-		case 2:
-			tabGestion = "active";
-			break;
-		case 3:
-			tabPlanCuenta = "active";
-			break;
-		case 4:
-			tabParametros = "active";
-			break;
-
-		default:
-			break;
-		}
-	}
-
-	private String aumentar1Nivel() {
-		System.out.println("aumentar1Nivel()");
-		String aux = ".";
-		int nivelAux = nivel;
-		int tamanioAux = arrayTamanio[nivelAux - 1];
-		for (int i = 0; i < tamanioAux; i++) {
-			aux = aux + "9";
-		}
-		return codigo + aux;
-	}
-
-	private String quitar1Nivel() {
-		System.out.println("quitar1Nivel()");
-		String aux = codigo;
-		int length = aux.length();
-		System.out.println("length: " + length);
-		for (int index = length; index > 0; index--) {
-			String letra = String.valueOf(codigo.charAt(index - 1));
-			System.out.println("letra: " + letra);
-			if (letra.equals(".")) {
-				return aux.substring(0, index - 1);
-			}
-		}
-		return aux;
-	}
-
-	private void actualizarCodigo() {
-		String aux = "";
-		for (int i = 0; i < nivel; i++) {
-			Integer t = arrayTamanio[i];
-			for (int j = 0; j < t; j++) {
-				aux = aux + "9";
-			}
-			aux = aux + ".";
-		}
-		codigo = aux.substring(0, aux.length() - 1);
-	}
-
-	private void cargarNivelToList(EDNivel aux) {
-		for (int index = 0; index < listNivel.size(); index++) {
-			EDNivel edNivel = listNivel.get(index);
-			if (edNivel.equals(aux)) {
-				listNivel.set(index, aux);
-				arrayTamanio[index] = aux.getTamanio();
-				return;
-			}
-		}
 	}
 
 	public void resetearFitrosTabla(String id) {
@@ -335,7 +158,6 @@ public class CreacionController implements Serializable {
 				buttonAnterior = false;
 				buttonSiguiente = true;
 				numeroTab = 1;
-				loadVarTabItem(1);
 				return;
 			}
 
@@ -414,48 +236,36 @@ public class CreacionController implements Serializable {
 		seleccionadaFormCompania = true;
 		seleccionadaFormGestion = false;
 		seleccionadaFormAgregarCompania = true;
-		formTitulo = "EMPRESA";
 		selectedCompania = new Compania();
 	}
 
-	private int digitoAnterior = 0;
-
-	public void onRowSelectTipoCuenta(SelectEvent event) {
-		loadVarTab();
-		/* digitoAnterior = selectedTipoCuenta.getDigito(); */
-	}
-
-	public void actualizarComponentes() {
-
-	}
-
-	public void actionButtonSiguiente() {
-		int numeroAux = numeroTab + 1;
-		if (numeroTab == 3 && numeroAux == 4) {
-			numeroTab = 4;
-			buttonAnterior = true;
-			buttonSiguiente = false;
-		} else {
-			numeroTab++;
-			buttonAnterior = true;
-			buttonSiguiente = true;
-		}
-		loadVarTabItem(numeroTab);
-	}
-
-	public void actionButtonAnterior() {
-		int numeroAux = numeroTab - 1;
-		if (numeroTab == 2 && numeroAux == 1) {
-			numeroTab = 1;
-			buttonAnterior = false;
-			buttonSiguiente = true;
-		} else {
-			numeroTab--;
-			buttonAnterior = true;
-			buttonSiguiente = true;
-		}
-		loadVarTabItem(numeroTab);
-	}
+	// public void actionButtonSiguiente() {
+	// int numeroAux = numeroTab + 1;
+	// if (numeroTab == 3 && numeroAux == 4) {
+	// numeroTab = 4;
+	// buttonAnterior = true;
+	// buttonSiguiente = false;
+	// } else {
+	// numeroTab++;
+	// buttonAnterior = true;
+	// buttonSiguiente = true;
+	// }
+	// loadVarTabItem(numeroTab);
+	// }
+	//
+	// public void actionButtonAnterior() {
+	// int numeroAux = numeroTab - 1;
+	// if (numeroTab == 2 && numeroAux == 1) {
+	// numeroTab = 1;
+	// buttonAnterior = false;
+	// buttonSiguiente = true;
+	// } else {
+	// numeroTab--;
+	// buttonAnterior = true;
+	// buttonSiguiente = true;
+	// }
+	// loadVarTabItem(numeroTab);
+	// }
 
 	// ---------------- get and set ----------------------
 
@@ -491,8 +301,6 @@ public class CreacionController implements Serializable {
 		seleccionada1 = true;
 		seleccionadaFormCompania = false;
 		seleccionadaFormGestion = true;
-		formTitulo = "GESTIÓN - "
-				+ selectedCompania.getDescripcion().toUpperCase();
 		this.selectedCompania = selectedCompania;
 	}
 
@@ -533,22 +341,6 @@ public class CreacionController implements Serializable {
 
 	public void setNombreCompania(String nombreCompania) {
 		this.nombreCompania = nombreCompania;
-	}
-
-	public String getPeriodo() {
-		return periodo;
-	}
-
-	public void setPeriodo(String periodo) {
-		this.periodo = periodo;
-	}
-
-	public String[] getArrayPeriodo() {
-		return arrayPeriodo;
-	}
-
-	public void setArrayPeriodo(String[] arrayPeriodo) {
-		this.arrayPeriodo = arrayPeriodo;
 	}
 
 	public List<Compania> getListFilterCompania() {
@@ -600,14 +392,6 @@ public class CreacionController implements Serializable {
 		this.seleccionadaFormAgregarCompania = seleccionadaFormAgregarCompania;
 	}
 
-	public String getFormTitulo() {
-		return formTitulo;
-	}
-
-	public void setFormTitulo(String formTitulo) {
-		this.formTitulo = formTitulo;
-	}
-
 	public boolean isCrear() {
 		return crear;
 	}
@@ -622,26 +406,6 @@ public class CreacionController implements Serializable {
 
 	public void setRegistrar(boolean registrar) {
 		this.registrar = registrar;
-	}
-
-	public String getNombreMonedaNacional() {
-		return nombreMonedaNacional;
-	}
-
-	public String getSimboloMonedaNacional() {
-		return simboloMonedaNacional;
-	}
-
-	public void setSimboloMonedaNacional(String simboloMonedaNacional) {
-		this.simboloMonedaNacional = simboloMonedaNacional;
-	}
-
-	public String getSimboloMonedaExtranjera() {
-		return simboloMonedaExtranjera;
-	}
-
-	public void setSimboloMonedaExtranjera(String simboloMonedaExtranjera) {
-		this.simboloMonedaExtranjera = simboloMonedaExtranjera;
 	}
 
 	public Compania getCompaniaLogin() {
@@ -660,41 +424,6 @@ public class CreacionController implements Serializable {
 		this.newCompania = newCompania;
 	}
 
-	public String[] getArrayNivel() {
-		return arrayNivel;
-	}
-
-	public void setArrayNivel(String[] arrayNivel) {
-		this.arrayNivel = arrayNivel;
-	}
-
-	public TreeNode getSelectedNode() {
-		return selectedNode;
-	}
-
-	public void setSelectedNode(TreeNode selectedNode) {
-		this.selectedNode = selectedNode;
-	}
-
-	public int getNivel() {
-		return nivel;
-	}
-
-	// para verificar que no siga aumentando al nivel maximo =9 o disminuyendo
-	// al nivelminimo=2
-	private boolean swNivel = true;
-
-	public void setNivel(int nivel) {
-		nivelAnterior = this.nivel;
-		if ((nivelAnterior == nivel && nivel == 2)
-				|| (nivelAnterior == nivel && nivel == 9)) {
-			swNivel = false;
-		} else {
-			swNivel = true;
-		}
-		this.nivel = nivel;
-	}
-
 	public String getCodigo() {
 		return codigo;
 	}
@@ -703,68 +432,12 @@ public class CreacionController implements Serializable {
 		this.codigo = codigo;
 	}
 
-	public String getPeriodoActual() {
-		return periodoActual;
-	}
-
-	public void setPeriodoActual(String periodoActual) {
-		this.periodoActual = periodoActual;
-	}
-
-	public String[] getArrayPeriodoActual() {
-		return arrayPeriodoActual;
-	}
-
-	public void setArrayPeriodoActual(String[] arrayPeriodoActual) {
-		this.arrayPeriodoActual = arrayPeriodoActual;
-	}
-
 	public boolean isSeleccionarForm1() {
 		return seleccionarForm1;
 	}
 
 	public void setSeleccionarForm1(boolean seleccionarForm1) {
 		this.seleccionarForm1 = seleccionarForm1;
-	}
-
-	public double getTipoCambio() {
-		return tipoCambio;
-	}
-
-	public void setTipoCambio(double tipoCambio) {
-		this.tipoCambio = tipoCambio;
-	}
-
-	public double getTipoCambioUfv() {
-		return tipoCambioUfv;
-	}
-
-	public void setTipoCambioUfv(double tipoCambioUfv) {
-		this.tipoCambioUfv = tipoCambioUfv;
-	}
-
-	public String getTipoPlanCuenta() {
-		return tipoPlanCuenta;
-	}
-
-	public void setTipoPlanCuenta(String tipoPlanCuenta) {
-		this.tipoPlanCuenta = tipoPlanCuenta;
-	}
-
-	public TreeNode getRootPC() {
-		return rootPC;
-	}
-
-	public void setRootPC(TreeNode rootPC) {
-		this.rootPC = rootPC;
-	}
-
-	public List<EDNivel> getListNivel() {
-		return listNivel;
-	}
-
-	public void setListNivel(List<EDNivel> listNivel) {
-		this.listNivel = listNivel;
 	}
 
 	public UIData getUsersDataTable() {
@@ -789,38 +462,6 @@ public class CreacionController implements Serializable {
 
 	public void setTamanio(int tamanio) {
 		this.tamanio = tamanio;
-	}
-
-	public String getTabCompania() {
-		return tabCompania;
-	}
-
-	public void setTabCompania(String tabCompania) {
-		this.tabCompania = tabCompania;
-	}
-
-	public String getTabGestion() {
-		return tabGestion;
-	}
-
-	public void setTabGestion(String tabGestion) {
-		this.tabGestion = tabGestion;
-	}
-
-	public String getTabPlanCuenta() {
-		return tabPlanCuenta;
-	}
-
-	public void setTabPlanCuenta(String tabPlanCuenta) {
-		this.tabPlanCuenta = tabPlanCuenta;
-	}
-
-	public String getTabParametros() {
-		return tabParametros;
-	}
-
-	public void setTabParametros(String tabParametros) {
-		this.tabParametros = tabParametros;
 	}
 
 	public int getNumeroTab() {
@@ -859,7 +500,8 @@ public class CreacionController implements Serializable {
 		return listUsuarioSucursals;
 	}
 
-	public void setListUsuarioSucursals(List<UsuarioSucursal> listUsuarioSucursals) {
+	public void setListUsuarioSucursals(
+			List<UsuarioSucursal> listUsuarioSucursals) {
 		this.listUsuarioSucursals = listUsuarioSucursals;
 	}
 
