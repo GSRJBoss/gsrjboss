@@ -14,10 +14,14 @@ import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.primefaces.component.datatable.DataTable;
+import org.primefaces.event.SelectEvent;
+
 import bo.com.spaps.dao.GrupoSanguineoDao;
 import bo.com.spaps.dao.SessionMain;
 import bo.com.spaps.model.GrupoSanguineo;
 import bo.com.spaps.model.Sucursal;
+import bo.com.spaps.model.Usuario;
 import bo.com.spaps.util.FacesUtil;
 
 @Named("grupoSanguineoController")
@@ -40,15 +44,18 @@ public class GrupoSanguineoController implements Serializable {
 	/******* OBJECT **********/
 	private GrupoSanguineo grupoSanguineo;
 	private GrupoSanguineo grupoSanguineoSelected;
-	private Sucursal sucursal;
+	private Sucursal sucursalLogin;
+	private Usuario usuarioLogin;
 
 	/******* LIST **********/
 	private List<GrupoSanguineo> listaGrupoSanguineo;
+	private String[] listaEstado = { "ACTIVO", "INACTIVO", "ELIMINADO" };
 
 	/******* ESTADOS **********/
 	private boolean modificar = false;
 	private boolean registrar = false;
 	private boolean crear = true;
+	private String estado = "AC";
 
 	@Inject
 	Conversation conversation;
@@ -68,7 +75,7 @@ public class GrupoSanguineoController implements Serializable {
 	}
 
 	public Sucursal getSucursal() {
-		return sucursal;
+		return sucursalLogin;
 	}
 
 	public List<GrupoSanguineo> getListaGrupoSanguineo() {
@@ -96,7 +103,7 @@ public class GrupoSanguineoController implements Serializable {
 	}
 
 	public void setSucursal(Sucursal sucursal) {
-		this.sucursal = sucursal;
+		this.sucursalLogin = sucursal;
 	}
 
 	public void setListaGrupoSanguineo(List<GrupoSanguineo> listaGrupoSanguineo) {
@@ -115,11 +122,68 @@ public class GrupoSanguineoController implements Serializable {
 		this.crear = crear;
 	}
 
+	public String[] getListaEstado() {
+		return listaEstado;
+	}
+
+	public void setListaEstado(String[] listaEstado) {
+		this.listaEstado = listaEstado;
+	}
+
+	public String getEstado() {
+		return estado;
+	}
+
+	public void setEstado(String estado) {
+		this.estado = estado;
+	}
+
+	public Sucursal getSucursalLogin() {
+		return sucursalLogin;
+	}
+
+	public void setSucursalLogin(Sucursal sucursalLogin) {
+		this.sucursalLogin = sucursalLogin;
+	}
+
+	public Usuario getUsuarioLogin() {
+		return usuarioLogin;
+	}
+
+	public void setUsuarioLogin(Usuario usuarioLogin) {
+		this.usuarioLogin = usuarioLogin;
+	}
+
+	public void cambiarAspecto() {
+		crear = false;
+		registrar = true;
+		modificar = false;
+	}
+
+	public void onRowSelect(SelectEvent event) {
+		crear = false;
+		registrar = false;
+		modificar = true;
+		grupoSanguineo = grupoSanguineoSelected;
+		estado = grupoSanguineo.getEstado();
+		resetearFitrosTabla("formTableGrupoSanguineo:dataTableGrupoSanguineo");
+	}
+
+	public void resetearFitrosTabla(String id) {
+		DataTable table = (DataTable) FacesContext.getCurrentInstance()
+				.getViewRoot().findComponent(id);
+		table.setSelection(null);
+		table.reset();
+	}
+
 	@PostConstruct
 	public void initNew() {
 		grupoSanguineo = new GrupoSanguineo();
 		grupoSanguineoSelected = new GrupoSanguineo();
-		sucursal = sessionMain.getSucursalLogin();
+		sucursalLogin = sessionMain.getSucursalLogin();
+		usuarioLogin = sessionMain.getUsuarioLogin();
+		listaGrupoSanguineo = grupoSanguineoDao
+				.obtenerGrupoSanguineoOrdenAscPorId();
 		setCrear(true);
 		setModificar(false);
 		setRegistrar(false);
@@ -128,7 +192,6 @@ public class GrupoSanguineoController implements Serializable {
 	public void registrar() {
 		try {
 			if (grupoSanguineo.getDescripcion().trim().isEmpty()
-					|| grupoSanguineo.getEstado().trim().isEmpty()
 					|| getSucursal() == null
 					|| getSucursal().getCompania() == null) {
 				FacesUtil.infoMessage("VALIDACION",
@@ -137,6 +200,7 @@ public class GrupoSanguineoController implements Serializable {
 			} else {
 				grupoSanguineo.setCompania(getSucursal().getCompania());
 				grupoSanguineo.setSucursal(getSucursal());
+				grupoSanguineo.setEstado("AC");
 				grupoSanguineo.setFechaRegistro(new Date());
 				grupoSanguineo.setFechaModificacion(grupoSanguineo
 						.getFechaRegistro());
@@ -162,8 +226,7 @@ public class GrupoSanguineoController implements Serializable {
 	public void actualizar() {
 		try {
 			if (grupoSanguineo.getDescripcion().trim().isEmpty()
-					|| grupoSanguineo.getEstado().trim().isEmpty()
-					|| getSucursal() == null
+					|| getEstado().trim().isEmpty() || getSucursal() == null
 					|| getSucursal().getCompania() == null) {
 				FacesUtil.infoMessage("VALIDACION",
 						"No puede haber campos vacíos");
@@ -171,6 +234,17 @@ public class GrupoSanguineoController implements Serializable {
 			} else {
 				grupoSanguineo.setCompania(getSucursal().getCompania());
 				grupoSanguineo.setSucursal(getSucursal());
+				if (getEstado().equals("ACTIVO")) {
+					grupoSanguineo.setEstado("AC");
+				} else {
+					if (getEstado().equals("INACTIVO")) {
+						grupoSanguineo.setEstado("IN");
+					} else {
+						if (getEstado().equals("ELIMINADO")) {
+							grupoSanguineo.setEstado("RM");
+						}
+					}
+				}
 				grupoSanguineo.setFechaModificacion(new Date());
 				grupoSanguineo.setUsuarioRegistro(sessionMain.getUsuarioLogin()
 						.getId());

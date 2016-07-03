@@ -9,8 +9,8 @@
 	template="/WEB-INF/templates/template_main.xhtml">
 
 	<ui:define name="head">
-		<title>Raza</title>
-		<f:event listener="#{razaController.initConversation}"
+		<title>grupoSanguineo</title>
+		<f:event listener="#{grupoSanguineoController.initConversation}"
 			type="preRenderView"></f:event>
 	</ui:define>
 
@@ -24,38 +24,39 @@
 							<div class="btn-group">
 								<p:commandLink id="buttonCancelar" value="&#160; Cancelar"
 									styleClass="btn btn-warning ion-minus-circled"
-									rendered="#{razaController.modificar or razaController.registrar}"
+									rendered="#{grupoSanguineoController.modificar or grupoSanguineoController.registrar}"
 									update=":formReg,:formBotonesHeader"
 									style="height:31px; padding:center"
-									action="#{razaController.initNew()}">
+									action="#{grupoSanguineoController.initNew()}">
 								</p:commandLink>
-								<p:commandLink id="buttonCrear1" value="&#160; Nuevo Raza"
+								<p:commandLink id="buttonCrear1"
+									value="&#160; Nuevo grupoSanguineo"
 									styleClass="btn btn-success ion-plus-round"
-									rendered="#{razaController.crear}"
+									rendered="#{grupoSanguineoController.crear}"
 									update=":formReg,:formBotonesHeader"
-									action="#{razaController.cambiarAspecto()}"
+									action="#{grupoSanguineoController.cambiarAspecto()}"
 									style="height:31px;">
 								</p:commandLink>
 								<p:commandLink id="buttonRegistrar" value="&#160; Registrar"
 									styleClass="btn btn-success ion-checkmark"
 									style="height:31px; padding:center"
-									rendered="#{razaController.registrar}"
-									update=":formBotonesHeader,:formReg,formGrowl:msgs1,formTableRaza"
-									action="#{razaController.registrar()}">
+									rendered="#{grupoSanguineoController.registrar}"
+									update=":formBotonesHeader,:formReg,formGrowl:msgs1,:formTableGrupoSanguineo"
+									action="#{grupoSanguineoController.registrar()}">
 								</p:commandLink>
 								<p:commandLink id="buttonModificar" value="&#160; Modificar"
 									styleClass="btn btn-primary ion-edit"
-									rendered="#{razaController.modificar}"
+									rendered="#{grupoSanguineoController.modificar}"
 									style="height:31px; padding:center"
-									update=":formBotonesHeader,:formReg,formGrowl:msgs1,:formTableRaza,:formReg:estado"
-									action="#{razaController.actualizar()}">
+									update=":formBotonesHeader,:formReg,formGrowl:msgs1,:formTableGrupoSanguineo,:formReg:estado"
+									action="#{grupoSanguineoController.actualizar()}">
 								</p:commandLink>
 								<p:commandLink id="buttonEliminar" value="&#160; Eliminar"
 									styleClass="btn btn-danger ion-close"
 									style="height:31px; padding:center"
-									rendered="#{razaController.modificar}"
-									update=":formBotonesHeader,:formReg,formGrowl:msgs1,:formTableRaza"
-									action="#{razaController.eliminar()}">
+									rendered="#{grupoSanguineoController.modificar}"
+									update=":formBotonesHeader,:formReg,formGrowl:msgs1,:formTableGrupoSanguineo"
+									action="#{grupoSanguineoController.eliminar()}">
 								</p:commandLink>
 							</div>
 						</div>
@@ -67,33 +68,21 @@
 					<div class="row">
 						<h:form id="formReg" autocomplete="off">
 							<ui:fragment
-								rendered="#{razaController.modificar or razaController.registrar}">
+								rendered="#{grupoSanguineoController.modificar or grupoSanguineoController.registrar}">
 								<div class="col-md-4">
 									<div class="panel panel-default">
 										<div class="panel-heading">
-											<h3 class="panel-title">Registro de Raza</h3>
+											<h3 class="panel-title">Registro de Grupo Sanguineo</h3>
 										</div>
 										<div class="panel-body">
 											<!-- start here register -->
 											<div class="box-content form-horizontal">
 												<div class="form-group ">
-													<div class="col-md-4 control-label">Codigo</div>
+													<div class="col-md-4 control-label">Descripcion</div>
 													<div class="col-md-8">
 														<h:inputText id="inputTextCodigo"
-															value="#{razaController.raza.codigo}"
-															disabled="#{razaController.raza.estado =='SU'}"
-															style=" color: #555555; background-image: none;"
-															styleClass="input-sm form-control">
-															<p:ajax event="change" />
-														</h:inputText>
-													</div>
-												</div>
-												<div class="form-group ">
-													<div class="col-md-4 control-label">Nombre</div>
-													<div class="col-md-8">
-														<h:inputText id="inputTextNombre"
-															value="#{razaController.raza.nombre}"
-															disabled="#{razaController.raza.estado =='SU'}"
+															value="#{grupoSanguineoController.grupoSanguineo.descripcion}"
+															disabled="#{grupoSanguineoController.grupoSanguineo.estado =='SU'}"
 															style=" color: #555555; background-image: none;"
 															styleClass="input-sm form-control">
 															<p:ajax event="change" />
@@ -106,8 +95,10 @@
 														<h:selectOneMenu id="estado"
 															styleClass="input-sm form-control"
 															style=" color: #555555; height:25px; font-size:11px;"
-															immediate="true" value="#{razaController.estado}">
-															<f:selectItems value="#{razaController.listaEstado}" />
+															immediate="true"
+															value="#{grupoSanguineoController.estado}">
+															<f:selectItems
+																value="#{grupoSanguineoController.listaEstado}" />
 															<f:ajax event="change" update=":formReg" />
 														</h:selectOneMenu>
 													</div>
@@ -122,40 +113,36 @@
 						</h:form>
 					</div>
 					<div>
-						<h:form id="formTableRaza">
+						<h:form id="formTableGrupoSanguineo">
 							<ui:fragment rendered="true">
 								<div class="col-md-12">
 									<div class="panel panel-default">
 										<div class="panel-heading">
-											<h3 class="panel-title">Lista de Razas</h3>
+											<h3 class="panel-title">Lista de grupoSanguineos</h3>
 										</div>
 										<!-- start here datatable -->
-										<p:dataTable id="dataTableRaza" var="item"
-											widgetVar="RazaTable" value="#{razaController.listaRaza}"
+										<p:dataTable id="dataTableGrupoSanguineo" var="item"
+											widgetVar="grupoSanguineoTable"
+											value="#{grupoSanguineoController.listaGrupoSanguineo}"
 											selectionMode="single"
 											style="font-size: 12px !important; line-height: 1.33846154 !important; font-family: sans-serif !important;"
 											emptyMessage="No se encontraron Registros."
-											selection="#{razaController.razaSelected}"
+											selection="#{grupoSanguineoController.grupoSanguineoSelected}"
 											rowKey="#{item.id}" reflow="true">
 
 											<p:ajax event="rowSelect"
-												listener="#{razaController.onRowSelect}"
-												update=":formReg,:formBotonesHeader,:formTableRaza" />
+												listener="#{grupoSanguineoController.onRowSelect}"
+												update=":formReg,:formBotonesHeader,:formTableGrupoSanguineo" />
 
 											<p:column width="8%" headerText="Identificador"
 												filterStyle="width: 100%; height:25px;"
 												style="text-align:center;" filterBy="#{item.id}">
 												<h:outputText value="#{item.id}" />
 											</p:column>
-											<p:column headerText="Codigo"
+											<p:column headerText="Descripcion"
 												filterStyle="width: 100%; height:25px;"
-												filterBy="#{item.codigo}">
-												<h:outputText value="#{item.codigo}" />
-											</p:column>
-											<p:column headerText="Nombre"
-												filterStyle="width: 100%; height:25px;"
-												filterBy="#{item.nombre}">
-												<h:outputText value="#{item.nombre}" />
+												filterBy="#{item.descripcion}">
+												<h:outputText value="#{item.descripcion}" />
 											</p:column>
 											<p:column width="10%" filterStyle="width: 100%; height:25px;"
 												headerText="Estado" style="text-align:center;"
@@ -180,7 +167,7 @@
 											</p:column>
 											<f:facet name="footer">
 												<h:outputText
-													value="#{razaController.listaRaza.size()} Registros en Total" />
+													value="#{grupoSanguineoController.listaGrupoSanguineo.size()} Registros en Total" />
 											</f:facet>
 										</p:dataTable>
 

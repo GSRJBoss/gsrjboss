@@ -271,12 +271,11 @@ public class RazaController implements Serializable {
 		}
 	}
 
-	public String endConversation() {
+	public void endConversation() {
 		if (!conversation.isTransient()) {
 			conversation.end();
 			System.out.println(">>>>>>>>>> CONVERSACION TERMINADA...");
 		}
-		return "kardex_producto.xhtml?faces-redirect=true";
 	}
 
 }
