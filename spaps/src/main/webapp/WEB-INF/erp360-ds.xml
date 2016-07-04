@@ -18,11 +18,11 @@
 	<!-- The datasource is bound into JNDI at this location. We reference this 
 		in META-INF/persistence.xml -->
 	<datasource jndi-name="java:jboss/datasources/spapsDS"
-		pool-name="spaps" enabled="true" use-ccm="false">
+		pool-name="spaps" enabled="true" use-ccm="true">
 
-		<connection-url>jdbc:postgresql://localhost:5432/spapsdb</connection-url>
-		<driver-class>org.postgresql.Driver</driver-class>
-		<driver>postgresql-9.4.1208.jre6.jar</driver>
+		<connection-url>jdbc:edb://localhost:5432/spapsdb</connection-url>
+		<driver-class>com.edb.Driver</driver-class>
+		<driver>edb-jdbc14.jar</driver>
 
 		<connection-property name="char.encoding">UTF-8
 		</connection-property>

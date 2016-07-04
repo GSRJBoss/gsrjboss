@@ -22,6 +22,16 @@ import bo.com.spaps.util.W;
 public class GrupoFamiliarDao extends
 		DataAccessObjectJpa<GrupoFamiliar, E, R, S, O, P, Q, U, V, W> {
 
+	private boolean isDelete = false;
+
+	public boolean isDelete() {
+		return isDelete;
+	}
+
+	public void setDelete(boolean isDelete) {
+		this.isDelete = isDelete;
+	}
+
 	public GrupoFamiliarDao() {
 		super(GrupoFamiliar.class);
 	}
@@ -52,8 +62,9 @@ public class GrupoFamiliarDao extends
 			beginTransaction();
 			grupoFamiliar = update(grupoFamiliar);
 			commitTransaction();
-			FacesUtil.infoMessage("Modificación Correcta", "GrupoFamiliar "
-					+ grupoFamiliar.getNombre());
+			if (!isDelete())
+				FacesUtil.infoMessage("Modificación Correcta", "GrupoFamiliar "
+						+ grupoFamiliar.getNombre());
 			return grupoFamiliar;
 		} catch (Exception e) {
 			String cause = e.getMessage();
@@ -61,7 +72,8 @@ public class GrupoFamiliarDao extends
 					.contains("org.hibernate.exception.ConstraintViolationException: could not execute statement")) {
 				FacesUtil.errorMessage("Ya existe un registro igual.");
 			} else {
-				FacesUtil.errorMessage("Error al modificar");
+				if (!isDelete())
+					FacesUtil.errorMessage("Error al modificar");
 			}
 			rollbackTransaction();
 			return null;
@@ -70,15 +82,15 @@ public class GrupoFamiliarDao extends
 
 	public boolean eliminar(GrupoFamiliar grupoFamiliar) {
 		try {
-			beginTransaction();
+			setDelete(true);
+			grupoFamiliar.setEstado("RM");
 			GrupoFamiliar bar = modificar(grupoFamiliar);
-			commitTransaction();
+			setDelete(false);
 			FacesUtil.infoMessage("Eliminación Correcta", "GrupoFamiliar "
 					+ grupoFamiliar.getNombre());
 			return bar != null ? true : false;
 		} catch (Exception e) {
 			FacesUtil.errorMessage("Error al eliminar");
-			rollbackTransaction();
 			return false;
 		}
 	}
