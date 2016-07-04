@@ -27,7 +27,7 @@
 									rendered="#{estadoCivilController.modificar or estadoCivilController.registrar}"
 									update=":formReg,:formBotonesHeader"
 									style="height:31px; padding:center"
-									action="#{estadoCivilController.Init()}">
+									action="#{estadoCivilController.initNew()}">
 								</p:commandLink>
 								<p:commandLink id="buttonCrear1"
 									value="&#160; Nuevo Estado Civil"
@@ -97,7 +97,7 @@
 															style=" color: #555555; height:25px; font-size:11px;"
 															immediate="true" value="#{estadoCivilController.estado}">
 															<f:selectItems
-																value="#{estadoCivilController.listEstado}" />
+																value="#{estadoCivilController.listaEstado}" />
 															<f:ajax event="change" update=":formReg" />
 														</h:selectOneMenu>
 													</div>
@@ -131,7 +131,7 @@
 
 											<p:ajax event="rowSelect"
 												listener="#{estadoCivilController.onRowSelect}"
-												update=":formReg,:formBotonesHeader,:formTableEstadoCivil" />
+												update=":formReg,:formBotonesHeader,:formTableEstadoCivil,:formReg:estado" />
 
 											<p:column width="8%" headerText="Identificador"
 												filterStyle="width: 100%; height:25px;"
@@ -148,8 +148,10 @@
 												filterBy="#{item.estado}">
 												<span class="label label-success"><h:outputText
 														rendered="#{item.estado=='AC'}" value="Activo" /></span>
-												<span class="label label-danger"><h:outputText
+												<span class="label label-warning"><h:outputText
 														rendered="#{item.estado=='IN'}" value="Inactivo" /></span>
+												<span class="label label-danger"><h:outputText
+														rendered="#{item.estado=='RM'}" value="Eliminado" /></span>
 											</p:column>
 											<p:column width="10%" filterStyle="width: 100%; height:25px;"
 												style="text-align:center;" headerText="Usuario Registro"

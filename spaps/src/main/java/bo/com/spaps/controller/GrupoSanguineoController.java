@@ -166,6 +166,16 @@ public class GrupoSanguineoController implements Serializable {
 		modificar = true;
 		grupoSanguineo = grupoSanguineoSelected;
 		estado = grupoSanguineo.getEstado();
+		if (estado.equals("AC")) {
+			setEstado("ACTIVO");
+		} else {
+			if (estado.equals("IN")) {
+				setEstado("INACTIVO");
+			} else {
+				setEstado("ELIMINADO");
+			}
+		}
+		FacesContext.getCurrentInstance().renderResponse();
 		resetearFitrosTabla("formTableGrupoSanguineo:dataTableGrupoSanguineo");
 	}
 
@@ -180,8 +190,8 @@ public class GrupoSanguineoController implements Serializable {
 	public void initNew() {
 		grupoSanguineo = new GrupoSanguineo();
 		grupoSanguineoSelected = new GrupoSanguineo();
-		sucursalLogin = sessionMain.getSucursalLogin();
 		usuarioLogin = sessionMain.getUsuarioLogin();
+		sucursalLogin = sessionMain.PruebaSucursal();
 		listaGrupoSanguineo = grupoSanguineoDao
 				.obtenerGrupoSanguineoOrdenAscPorId();
 		setCrear(true);
@@ -198,23 +208,15 @@ public class GrupoSanguineoController implements Serializable {
 						"No puede haber campos vacíos");
 				return;
 			} else {
-				grupoSanguineo.setCompania(getSucursal().getCompania());
-				grupoSanguineo.setSucursal(getSucursal());
+				grupoSanguineo.setSucursal(getSucursalLogin());
+				grupoSanguineo.setCompania(getSucursalLogin().getCompania());
+				grupoSanguineo.setUsuarioRegistro(getUsuarioLogin().getId());
 				grupoSanguineo.setEstado("AC");
 				grupoSanguineo.setFechaRegistro(new Date());
 				grupoSanguineo.setFechaModificacion(grupoSanguineo
 						.getFechaRegistro());
-				grupoSanguineo.setUsuarioRegistro(sessionMain.getUsuarioLogin()
-						.getId());
-				GrupoSanguineo r = grupoSanguineoDao.registrar(grupoSanguineo);
-				if (r != null) {
-					FacesUtil.infoMessage("GrupoSanguineo registrado",
-							r.toString());
-					initNew();
-				} else {
-					FacesUtil.errorMessage("Error al registrar");
-					initNew();
-				}
+				grupoSanguineoDao.registrar(grupoSanguineo);
+				initNew();
 			}
 		} catch (Exception e) {
 			System.out.println("Error en registro de grupoSanguineo: "
@@ -232,32 +234,24 @@ public class GrupoSanguineoController implements Serializable {
 						"No puede haber campos vacíos");
 				return;
 			} else {
-				grupoSanguineo.setCompania(getSucursal().getCompania());
-				grupoSanguineo.setSucursal(getSucursal());
-				if (getEstado().equals("ACTIVO")) {
+				grupoSanguineo.setUsuarioRegistro(getUsuarioLogin().getId());
+				if (getEstado().equals("ACTIVO") || getEstado().equals("AC")) {
 					grupoSanguineo.setEstado("AC");
 				} else {
-					if (getEstado().equals("INACTIVO")) {
+					if (getEstado().equals("INACTIVO")
+							|| getEstado().equals("IN")) {
 						grupoSanguineo.setEstado("IN");
 					} else {
-						if (getEstado().equals("ELIMINADO")) {
-							grupoSanguineo.setEstado("RM");
+						if (getEstado().equals("ELIMINADO")
+								|| getEstado().equals("RM")) {
 						}
+						grupoSanguineo.setEstado("RM");
 					}
 				}
-				grupoSanguineo.setFechaModificacion(new Date());
-				grupoSanguineo.setUsuarioRegistro(sessionMain.getUsuarioLogin()
-						.getId());
-				GrupoSanguineo r = grupoSanguineoDao.modificar(grupoSanguineo);
-				if (r != null) {
-					FacesUtil.infoMessage("GrupoSanguineo actualizado",
-							r.toString());
-					initNew();
-				} else {
-					FacesUtil.errorMessage("Error al actualizar");
-					initNew();
-				}
 			}
+			grupoSanguineo.setFechaModificacion(new Date());
+			grupoSanguineoDao.modificar(grupoSanguineo);
+			initNew();
 		} catch (Exception e) {
 			System.out.println("Error en modificacion de grupoSanguineo: "
 					+ e.getMessage());
@@ -267,14 +261,8 @@ public class GrupoSanguineoController implements Serializable {
 
 	public void eliminar() {
 		try {
-			if (grupoSanguineoDao.eliminar(grupoSanguineo)) {
-				FacesUtil.infoMessage("GrupoSanguineo Eliminado",
-						grupoSanguineo.toString());
-				initNew();
-			} else {
-				FacesUtil.errorMessage("Error al eliminar");
-				initNew();
-			}
+			grupoSanguineoDao.eliminar(grupoSanguineo);
+			initNew();
 		} catch (Exception e) {
 			System.out.println("Error en eliminacion de grupoSanguineo: "
 					+ e.getMessage());
@@ -289,12 +277,11 @@ public class GrupoSanguineoController implements Serializable {
 		}
 	}
 
-	public String endConversation() {
+	public void endConversation() {
 		if (!conversation.isTransient()) {
 			conversation.end();
 			System.out.println(">>>>>>>>>> CONVERSACION TERMINADA...");
 		}
-		return "kardex_producto.xhtml?faces-redirect=true";
 	}
 
 }

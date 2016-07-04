@@ -84,7 +84,8 @@
 															value="#{grupoSanguineoController.grupoSanguineo.descripcion}"
 															disabled="#{grupoSanguineoController.grupoSanguineo.estado =='SU'}"
 															style=" color: #555555; background-image: none;"
-															styleClass="input-sm form-control">
+															styleClass="input-sm form-control" required="true"
+															requiredMessage="Campo obligatorio">
 															<p:ajax event="change" />
 														</h:inputText>
 													</div>
@@ -132,7 +133,7 @@
 
 											<p:ajax event="rowSelect"
 												listener="#{grupoSanguineoController.onRowSelect}"
-												update=":formReg,:formBotonesHeader,:formTableGrupoSanguineo" />
+												update=":formReg,:formBotonesHeader,:formTableGrupoSanguineo,:formReg:estado" />
 
 											<p:column width="8%" headerText="Identificador"
 												filterStyle="width: 100%; height:25px;"
@@ -149,8 +150,10 @@
 												filterBy="#{item.estado}">
 												<span class="label label-success"><h:outputText
 														rendered="#{item.estado=='AC'}" value="Activo" /></span>
-												<span class="label label-danger"><h:outputText
+												<span class="label label-warning"><h:outputText
 														rendered="#{item.estado=='IN'}" value="Inactivo" /></span>
+												<span class="label label-danger"><h:outputText
+														rendered="#{item.estado=='RM'}" value="Eliminado" /></span>
 											</p:column>
 											<p:column width="10%" filterStyle="width: 100%; height:25px;"
 												style="text-align:center;" headerText="Usuario Registro"

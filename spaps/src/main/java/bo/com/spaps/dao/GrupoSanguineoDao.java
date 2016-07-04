@@ -22,6 +22,16 @@ import bo.com.spaps.util.W;
 public class GrupoSanguineoDao extends
 		DataAccessObjectJpa<GrupoSanguineo, E, R, S, O, P, Q, U, V, W> {
 
+	private boolean isDelete = false;
+
+	public boolean isDelete() {
+		return isDelete;
+	}
+
+	public void setDelete(boolean isDelete) {
+		this.isDelete = isDelete;
+	}
+
 	public GrupoSanguineoDao() {
 		super(GrupoSanguineo.class);
 	}
@@ -31,7 +41,7 @@ public class GrupoSanguineoDao extends
 			beginTransaction();
 			GrupoSanguineo = create(GrupoSanguineo);
 			commitTransaction();
-			FacesUtil.infoMessage("Registro Correcto", "GrupoSanguineo "
+			FacesUtil.infoMessage("Registro Correcto", "Grupo Sanguineo "
 					+ GrupoSanguineo.getDescripcion());
 			return GrupoSanguineo;
 		} catch (Exception e) {
@@ -52,8 +62,9 @@ public class GrupoSanguineoDao extends
 			beginTransaction();
 			GrupoSanguineo = update(GrupoSanguineo);
 			commitTransaction();
-			FacesUtil.infoMessage("Modificación Correcta", "GrupoSanguineo "
-					+ GrupoSanguineo.getDescripcion());
+			if (!isDelete())
+				FacesUtil.infoMessage("Modificación Correcta",
+						"Grupo Sanguineo " + GrupoSanguineo.getDescripcion());
 			return GrupoSanguineo;
 		} catch (Exception e) {
 			String cause = e.getMessage();
@@ -61,7 +72,8 @@ public class GrupoSanguineoDao extends
 					.contains("org.hibernate.exception.ConstraintViolationException: could not execute statement")) {
 				FacesUtil.errorMessage("Ya existe un registro igual.");
 			} else {
-				FacesUtil.errorMessage("Error al modificar");
+				if (!isDelete())
+					FacesUtil.errorMessage("Error al modificar");
 			}
 			rollbackTransaction();
 			return null;
@@ -70,15 +82,15 @@ public class GrupoSanguineoDao extends
 
 	public boolean eliminar(GrupoSanguineo GrupoSanguineo) {
 		try {
-			beginTransaction();
+			setDelete(true);
+			GrupoSanguineo.setEstado("RM");
 			GrupoSanguineo bar = modificar(GrupoSanguineo);
-			commitTransaction();
-			FacesUtil.infoMessage("Eliminación Correcta", "GrupoSanguineo "
+			setDelete(false);
+			FacesUtil.infoMessage("Eliminación Correcta", "Grupo Sanguineo "
 					+ GrupoSanguineo.getDescripcion());
 			return bar != null ? true : false;
 		} catch (Exception e) {
 			FacesUtil.errorMessage("Error al eliminar");
-			rollbackTransaction();
 			return false;
 		}
 	}

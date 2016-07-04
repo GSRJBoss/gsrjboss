@@ -4,7 +4,6 @@
 package bo.com.spaps.controller;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
@@ -23,6 +22,7 @@ import bo.com.spaps.dao.EstadoCivilDao;
 import bo.com.spaps.dao.SessionMain;
 import bo.com.spaps.model.EstadoCivil;
 import bo.com.spaps.model.Sucursal;
+import bo.com.spaps.model.Usuario;
 import bo.com.spaps.util.FacesUtil;
 
 @Named("estadoCivilController")
@@ -48,16 +48,17 @@ public class EstadoCivilController implements Serializable {
 	private EstadoCivil estadoCivil;
 	private EstadoCivil estadoCivilSelected;
 	private Sucursal sucursalLogin;
+	private Usuario usuarioLogin;
 
 	/******* LIST **********/
 	private List<EstadoCivil> listaEstadoCivil;
-	private List<String> listEstado = new ArrayList<>();
+	private String[] listaEstado = { "ACTIVO", "INACTIVO", "ELIMINADO" };
 
 	/******* ESTADOS **********/
 	private boolean modificar = false;
 	private boolean registrar = false;
 	private boolean crear = true;
-	private String estado = "";
+	private String estado = "AC";
 
 	// columnas
 	private String tipoColumnRegistro = "col-md-4"; // 4
@@ -86,14 +87,6 @@ public class EstadoCivilController implements Serializable {
 
 	public void setEstadoCivilSelected(EstadoCivil estadoCivilSelected) {
 		this.estadoCivilSelected = estadoCivilSelected;
-	}
-
-	public Sucursal getSucursal() {
-		return sucursalLogin;
-	}
-
-	public void setSucursal(Sucursal sucursal) {
-		this.sucursalLogin = sucursal;
 	}
 
 	public List<EstadoCivil> getListaEstadoCivil() {
@@ -128,6 +121,30 @@ public class EstadoCivilController implements Serializable {
 		this.crear = crear;
 	}
 
+	public Sucursal getSucursalLogin() {
+		return sucursalLogin;
+	}
+
+	public void setSucursalLogin(Sucursal sucursalLogin) {
+		this.sucursalLogin = sucursalLogin;
+	}
+
+	public Usuario getUsuarioLogin() {
+		return usuarioLogin;
+	}
+
+	public void setUsuarioLogin(Usuario usuarioLogin) {
+		this.usuarioLogin = usuarioLogin;
+	}
+
+	public String[] getListaEstado() {
+		return listaEstado;
+	}
+
+	public void setListaEstado(String[] listaEstado) {
+		this.listaEstado = listaEstado;
+	}
+
 	public String getTipoColumnRegistro() {
 		return tipoColumnRegistro;
 	}
@@ -144,14 +161,6 @@ public class EstadoCivilController implements Serializable {
 		this.tipoColumnTable = tipoColumnTable;
 	}
 
-	public List<String> getListEstado() {
-		return listEstado;
-	}
-
-	public void setListEstado(List<String> listEstado) {
-		this.listEstado = listEstado;
-	}
-
 	public String getEstado() {
 		return estado;
 	}
@@ -160,26 +169,14 @@ public class EstadoCivilController implements Serializable {
 		this.estado = estado;
 	}
 
-	public void CargarEstados() {
-		getListEstado().add("ACTIVO");
-		getListEstado().add("INACTIVO");
-	}
-
-	public void menu() {
-		FacesUtil.infoMessage("VALIDACION", getEstado());
-	}
-
 	@PostConstruct
 	public void initNew() {
 		initConversation();
 		estadoCivil = new EstadoCivil();
 		estadoCivilSelected = new EstadoCivil();
-		CargarEstados();
-		// sucursalLogin = sessionMain.getSucursalLogin();
-		listaEstadoCivil = new ArrayList<>();
+		usuarioLogin = sessionMain.getUsuarioLogin();
+		sucursalLogin = sessionMain.PruebaSucursal();
 		listaEstadoCivil = estadoCivilDao.obtenerEstadoCivilOrdenAscPorId();
-		System.out.println("lista de estados civiles tiene: "
-				+ listaEstadoCivil.size());
 		setCrear(true);
 		setModificar(false);
 		setRegistrar(false);
@@ -201,44 +198,21 @@ public class EstadoCivilController implements Serializable {
 			log.info("entro a registrar");
 			System.out.println("entro a registrar");
 			if (estadoCivil.getDescripcion().trim().isEmpty()
-			/*
-			 * || estadoCivil.getEstado().trim().isEmpty() || getSucursal() ==
-			 * null
-			 */) {
-				log.info("entro a registrar if");
-				System.out.println("entro a registrar if");
+					|| getSucursalLogin() == null
+					|| getSucursalLogin().getCompania() == null) {
 				FacesUtil.infoMessage("VALIDACION",
 						"No puede haber campos vacíos");
 				return;
 			} else {
-				log.info("entro a registrar else");
-				System.out.println("entro a registrar else");
-				// estadoCivil.setCompania(getSucursal().getCompania());
-				// estadoCivil.setSucursal(getSucursal());
-				System.out.println("Sucursal : "
-						+ sessionMain.PruebaSucursal().getDescripcion());
-				estadoCivil.setSucursal(sessionMain.PruebaSucursal());
-				estadoCivil
-						.setCompania(estadoCivil.getSucursal().getCompania());
-				System.out.println("compania : "
-						+ estadoCivil.getCompania().getDescripcion());
+				estadoCivil.setSucursal(getSucursalLogin());
+				estadoCivil.setCompania(getSucursalLogin().getCompania());
+				estadoCivil.setUsuarioRegistro(getUsuarioLogin().getId());
 				estadoCivil.setFechaRegistro(new Date());
 				estadoCivil
 						.setFechaModificacion(estadoCivil.getFechaRegistro());
-				// estadoCivil.setUsuarioRegistro(sessionMain.getUsuarioLogin().getId());
-				estadoCivil.setUsuarioRegistro(sessionMain.PruebaUsuario()
-						.getId());
-				System.out.println("usuario : "
-						+ estadoCivil.getUsuarioRegistro());
-				EstadoCivil r = estadoCivilDao.registrar(estadoCivil);
-				if (r != null) {
-					FacesUtil.infoMessage("EstadoCivil registrado",
-							r.toString());
-					Init();
-				} else {
-					FacesUtil.errorMessage("Error al registrar");
-					Init();
-				}
+				estadoCivil.setEstado("AC");
+				estadoCivilDao.registrar(estadoCivil);
+				initNew();
 			}
 		} catch (Exception e) {
 			System.out.println("Error en registro de estadoCivil: "
@@ -262,26 +236,22 @@ public class EstadoCivilController implements Serializable {
 				return;
 			} else {
 				estadoCivil.setFechaModificacion(new Date());
-				estadoCivil.setUsuarioRegistro(sessionMain.getUsuarioLogin()
-						.getId());
-				System.out.println(getEstado());
-				FacesUtil.infoMessage("Estado", getEstado());
-				if (getEstado().equals("ACTIVO")) {
+				estadoCivil.setUsuarioRegistro(getUsuarioLogin().getId());
+				if (getEstado().equals("ACTIVO") || getEstado().equals("AC")) {
 					estadoCivil.setEstado("AC");
 				} else {
-					if (getEstado().equals("INACTIVO"))
+					if (getEstado().equals("INACTIVO")
+							|| getEstado().equals("IN")) {
 						estadoCivil.setEstado("IN");
+					} else {
+						if (getEstado().equals("ELIMINADO")
+								|| getEstado().equals("RM")) {
+							estadoCivil.setEstado("RM");
+						}
+					}
 				}
-				System.out.println(estadoCivil.getEstado());
-				EstadoCivil r = estadoCivilDao.modificar(estadoCivil);
-				if (r != null) {
-					FacesUtil.infoMessage("EstadoCivil actualizado",
-							r.toString());
-					Init();
-				} else {
-					FacesUtil.errorMessage("Error al actualizar");
-					Init();
-				}
+				estadoCivilDao.modificar(estadoCivil);
+				initNew();
 			}
 		} catch (Exception e) {
 			System.out.println("Error en modificacion de estadoCivil: "
@@ -292,14 +262,8 @@ public class EstadoCivilController implements Serializable {
 
 	public void eliminar() {
 		try {
-			if (estadoCivilDao.eliminar(estadoCivil)) {
-				FacesUtil.infoMessage("EstadoCivil Eliminado",
-						estadoCivil.toString());
-				Init();
-			} else {
-				FacesUtil.errorMessage("Error al eliminar");
-				Init();
-			}
+			estadoCivilDao.eliminar(estadoCivil);
+			initNew();
 		} catch (Exception e) {
 			System.out.println("Error en eliminacion de estadoCivil: "
 					+ e.getMessage());
@@ -327,6 +291,17 @@ public class EstadoCivilController implements Serializable {
 		modificar = true;
 		estadoCivil = estadoCivilSelected;
 		tipoColumnTable = "col-md-8";
+		estado = estadoCivil.getEstado();
+		if (estado.equals("AC")) {
+			setEstado("ACTIVO");
+		} else {
+			if (estado.equals("IN")) {
+				setEstado("INACTIVO");
+			} else {
+				setEstado("ELIMINADO");
+			}
+		}
+		FacesContext.getCurrentInstance().renderResponse();
 		resetearFitrosTabla("formTableEstadoCivil:dataTableEstadoCivil");
 	}
 

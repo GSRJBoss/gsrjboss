@@ -22,6 +22,16 @@ import bo.com.spaps.util.W;
 public class EstadoCivilDao extends
 		DataAccessObjectJpa<EstadoCivil, E, R, S, O, P, Q, U, V, W> {
 
+	private boolean isDelete = false;
+
+	public boolean isDelete() {
+		return isDelete;
+	}
+
+	public void setDelete(boolean isDelete) {
+		this.isDelete = isDelete;
+	}
+
 	public EstadoCivilDao() {
 		super(EstadoCivil.class);
 	}
@@ -52,8 +62,9 @@ public class EstadoCivilDao extends
 			beginTransaction();
 			EstadoCivil = update(EstadoCivil);
 			commitTransaction();
-			FacesUtil.infoMessage("Modificación Correcta", "EstadoCivil "
-					+ EstadoCivil.getDescripcion());
+			if (!isDelete())
+				FacesUtil.infoMessage("Modificación Correcta", "EstadoCivil "
+						+ EstadoCivil.getDescripcion());
 			return EstadoCivil;
 		} catch (Exception e) {
 			String cause = e.getMessage();
@@ -61,7 +72,8 @@ public class EstadoCivilDao extends
 					.contains("org.hibernate.exception.ConstraintViolationException: could not execute statement")) {
 				FacesUtil.errorMessage("Ya existe un registro igual.");
 			} else {
-				FacesUtil.errorMessage("Error al modificar");
+				if (!isDelete())
+					FacesUtil.errorMessage("Error al modificar");
 			}
 			rollbackTransaction();
 			return null;
@@ -70,8 +82,12 @@ public class EstadoCivilDao extends
 
 	public boolean eliminar(EstadoCivil EstadoCivil) {
 		try {
-			EstadoCivil.setEstado("IN");
+			setDelete(true);
+			EstadoCivil.setEstado("RM");
 			EstadoCivil bar = modificar(EstadoCivil);
+			FacesUtil.infoMessage("Eliminación Correcta", "Grupo Sanguineo "
+					+ EstadoCivil.toString());
+			setDelete(false);
 			return bar != null ? true : false;
 		} catch (Exception e) {
 			FacesUtil.errorMessage("Error al eliminar");

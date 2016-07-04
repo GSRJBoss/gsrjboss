@@ -22,6 +22,16 @@ import bo.com.spaps.util.W;
 public class DocumentoIdentidadDao extends
 		DataAccessObjectJpa<DocumentoIdentidad, E, R, S, O, P, Q, U, V, W> {
 
+	private boolean isDelete = false;
+
+	public boolean isDelete() {
+		return isDelete;
+	}
+
+	public void setDelete(boolean isDelete) {
+		this.isDelete = isDelete;
+	}
+
 	public DocumentoIdentidadDao() {
 		super(DocumentoIdentidad.class);
 	}
@@ -52,8 +62,9 @@ public class DocumentoIdentidadDao extends
 			beginTransaction();
 			DocumentoIdentidad = update(DocumentoIdentidad);
 			commitTransaction();
-			FacesUtil.infoMessage("Modificación Correcta",
-					"DocumentoIdentidad " + DocumentoIdentidad.getNombre());
+			if (!isDelete())
+				FacesUtil.infoMessage("Modificación Correcta",
+						"DocumentoIdentidad " + DocumentoIdentidad.getNombre());
 			return DocumentoIdentidad;
 		} catch (Exception e) {
 			String cause = e.getMessage();
@@ -61,7 +72,8 @@ public class DocumentoIdentidadDao extends
 					.contains("org.hibernate.exception.ConstraintViolationException: could not execute statement")) {
 				FacesUtil.errorMessage("Ya existe un registro igual.");
 			} else {
-				FacesUtil.errorMessage("Error al modificar");
+				if (!isDelete())
+					FacesUtil.errorMessage("Error al modificar");
 			}
 			rollbackTransaction();
 			return null;
@@ -70,8 +82,12 @@ public class DocumentoIdentidadDao extends
 
 	public boolean eliminar(DocumentoIdentidad DocumentoIdentidad) {
 		try {
+			setDelete(true);
 			DocumentoIdentidad.setEstado("RM");
 			DocumentoIdentidad bar = modificar(DocumentoIdentidad);
+			FacesUtil.infoMessage("Eliminación Correcta", "Grupo Sanguineo "
+					+ DocumentoIdentidad.toString());
+			setDelete(false);
 			return bar != null ? true : false;
 		} catch (Exception e) {
 			FacesUtil.errorMessage("Error al eliminar");

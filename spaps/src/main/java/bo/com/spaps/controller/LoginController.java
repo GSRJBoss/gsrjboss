@@ -33,6 +33,7 @@ import bo.com.spaps.model.Usuario;
 import bo.com.spaps.service.UsuarioRegistration;
 import bo.com.spaps.util.DateUtility;
 import bo.com.spaps.util.FacesUtil;
+
 //import bo.com.erp360.model.security.UsuarioRol;
 
 @Named(value = "loginController")
@@ -40,19 +41,19 @@ import bo.com.spaps.util.FacesUtil;
 public class LoginController implements Serializable {
 
 	private static final long serialVersionUID = 903796340358480031L;
-	
-	private @Inject SessionMain sessionMain; //variable del login
+
+	private @Inject SessionMain sessionMain; // variable del login
 	private @Inject RolDao rolDao;
-	private @Inject PermisoDao  permisoDao;
+	private @Inject PermisoDao permisoDao;
 
 	private String username;
 	private String password;
 
-	//temporal
+	// temporal
 	private StreamedContent fotoPerfilTemp;
 
 	private UploadedFile file;
-	
+
 	private UploadedFile fileLogo;;
 
 	private boolean modificar = false;
@@ -66,25 +67,28 @@ public class LoginController implements Serializable {
 
 	public void login() {
 		System.out.println(" ------- login() ----");
-		if(username.isEmpty() || password.isEmpty()){
+		if (username.isEmpty() || password.isEmpty()) {
 			System.out.println("login() -> Usuario o Password sin datos.");
 			FacesUtil.errorMessage("Ingresar Usuario y Contraseña.");
-			return; 
+			return;
 		}
 
 		FacesContext context = FacesContext.getCurrentInstance();
-		HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
-		Usuario usuarioSession = sessionMain.validarUsuario_(username, password);
-		System.out.println("logeo : "+usuarioSession.getNombre());
-		if(usuarioSession!=null){
-			//validacion usuario eliminado
-			if(usuarioSession.getState().equals("RM")){
-				FacesUtil.infoMessage("Verificar!","Usuario o contraseña incorrecta");
+		HttpServletRequest request = (HttpServletRequest) context
+				.getExternalContext().getRequest();
+		Usuario usuarioSession = sessionMain
+				.validarUsuario_(username, password);
+		System.out.println("logeo : " + usuarioSession.getNombre());
+		if (usuarioSession != null) {
+			// validacion usuario eliminado
+			if (usuarioSession.getState().equals("RM")) {
+				FacesUtil.infoMessage("Verificar!",
+						"Usuario o contraseña incorrecta");
 				return;
 			}
-			//validacion usuario inactivo
-			if(usuarioSession.getState().equals("IN")){
-				FacesUtil.infoMessage("Usuario Inactivo","");
+			// validacion usuario inactivo
+			if (usuarioSession.getState().equals("IN")) {
+				FacesUtil.infoMessage("Usuario Inactivo", "");
 				return;
 			}
 			try {
@@ -93,60 +97,70 @@ public class LoginController implements Serializable {
 				}
 				request.login(username, password);
 				load(usuarioSession);
-				/*cargarPermisosUserSession();*/
+				/* cargarPermisosUserSession(); */
 				try {
-					context.getExternalContext().redirect(request.getContextPath() + "/pages/index.xhtml");
+					context.getExternalContext().redirect(
+							request.getContextPath() + "/pages/index.xhtml");
 				} catch (IOException ex) {
-					context.addMessage(null, new FacesMessage("Error!", "Ocurrio un Error!"));
+					context.addMessage(null, new FacesMessage("Error!",
+							"Ocurrio un Error!"));
 				}
 			} catch (ServletException e) {
-				System.out.println("login() -> "+ e.toString());
-				context.addMessage(null, new FacesMessage("Verificar!", "Usuario o contraseña incorrecta"));
+				System.out.println("login() -> " + e.toString());
+				context.addMessage(null, new FacesMessage("Verificar!",
+						"Usuario o contraseña incorrecta"));
 			}
-		} else{
+		} else {
 			System.out.println("login() -> No existe Usuario");
-			FacesUtil.errorMessage("Revisar Usuario o Contraseña."); 
+			FacesUtil.errorMessage("Revisar Usuario o Contraseña.");
 		}
 	}
 
-	private void load(Usuario usuario){
+	private void load(Usuario usuario) {
 		this.usuarioSession = usuario;
 		Rol rol = usuarioSession.getRol();
 		sessionMain.setUsuarioLogin(usuario);
-		//sessionMain.cargarPermisos(usuarioRolV1.getRoles());
+		// sessionMain.setSucursalLogin(usuario.getSucursal());
+		// sessionMain.cargarPermisos(usuarioRolV1.getRoles());
 		setImageUserSession();
 		setImageLogo();
 	}
 
 	public void logout() {
 		FacesContext context = FacesContext.getCurrentInstance();
-		HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+		HttpServletRequest request = (HttpServletRequest) context
+				.getExternalContext().getRequest();
 		HttpSession session = request.getSession(false);
-		System.out.println( "User ({0}) Cerrando sesion #" + DateUtility.getCurrentDateTime()+" user"+ request.getUserPrincipal().getName());
+		System.out.println("User ({0}) Cerrando sesion #"
+				+ DateUtility.getCurrentDateTime() + " user"
+				+ request.getUserPrincipal().getName());
 		if (session != null) {
 			session.invalidate();
 			try {
-				context.getExternalContext().redirect(request.getContextPath() + "/login.xhtml");
+				context.getExternalContext().redirect(
+						request.getContextPath() + "/login.xhtml");
 			} catch (IOException e) {
-				System.out.println("logout() -> "+e.toString());
+				System.out.println("logout() -> " + e.toString());
 			}
 		}
 	}
 
-	public void verificarTipoCambio(){
+	public void verificarTipoCambio() {
 		System.out.println("verificarTipoCambio()");
 		RequestContext.getCurrentInstance().execute("stickyTipoCambio()");
 		int test = 0;
-		if( 0 == test){
-			//RequestContext.getCurrentInstance().execute("stickyTipoCambio()");
+		if (0 == test) {
+			// RequestContext.getCurrentInstance().execute("stickyTipoCambio()");
 		}
 	}
 
-	private static byte[] toByteArrayUsingJava(InputStream is) throws IOException{ 
+	private static byte[] toByteArrayUsingJava(InputStream is)
+			throws IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		int reads = is.read();
-		while(reads != -1){
-			baos.write(reads); reads = is.read(); 
+		while (reads != -1) {
+			baos.write(reads);
+			reads = is.read();
 		}
 		return baos.toByteArray();
 	}
@@ -189,18 +203,20 @@ public class LoginController implements Serializable {
 	}
 
 	private StreamedContent getImageDefault() {
-		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		ClassLoader classLoader = Thread.currentThread()
+				.getContextClassLoader();
 		InputStream stream = classLoader.getResourceAsStream("avatar.png");
 		return new DefaultStreamedContent(stream, "image/png");
 	}
-	
+
 	private StreamedContent getImageDefaultLogo() {
-		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		ClassLoader classLoader = Thread.currentThread()
+				.getContextClassLoader();
 		InputStream stream = classLoader.getResourceAsStream("logo.png");
 		return new DefaultStreamedContent(stream, "image/png");
 	}
 
-	///perfil
+	// /perfil
 	private @Inject UsuarioRegistration usuarioRegistration;
 	private @Inject CompaniaDao CompaniaDao;
 	private Usuario usuarioSession;
@@ -216,7 +232,7 @@ public class LoginController implements Serializable {
 			System.out.println("upload()  OK");
 		}
 	}
-	
+
 	public void setImageUserSession2() {
 		// cargar foto del usuario
 		try {
@@ -231,7 +247,7 @@ public class LoginController implements Serializable {
 					+ e.getMessage());
 		}
 	}
-	
+
 	public void uploadLogo() {
 		setModificar(true);
 		System.out.println("upload()  fileLogo:" + fileLogo);
@@ -244,14 +260,15 @@ public class LoginController implements Serializable {
 			System.out.println("uploadLogo()  OK");
 		}
 	}
-	
+
 	public void setImageLogo() {
 		// cargar foto del usuario
 		try {
 			HttpSession session = (HttpSession) FacesContext
 					.getCurrentInstance().getExternalContext()
 					.getSession(false);
-			byte[] image = sessionMain.getSucursalLogin().getCompania().getFotoPerfil();
+			byte[] image = sessionMain.getSucursalLogin().getCompania()
+					.getFotoPerfil();
 			if (image == null) {
 				image = toByteArrayUsingJava(getImageDefaultLogo().getStream());
 			}
@@ -269,7 +286,8 @@ public class LoginController implements Serializable {
 			HttpSession session = (HttpSession) FacesContext
 					.getCurrentInstance().getExternalContext()
 					.getSession(false);
-			byte[] image = sessionMain.getSucursalLogin().getCompania().getFotoPerfil();
+			byte[] image = sessionMain.getSucursalLogin().getCompania()
+					.getFotoPerfil();
 			session.setAttribute("imageLogo", image);
 
 		} catch (Exception e) {
@@ -277,7 +295,7 @@ public class LoginController implements Serializable {
 					+ e.getMessage());
 		}
 	}
-	
+
 	public StreamedContent getImageLogo() {
 		String mimeType = "image/png";
 		StreamedContent file;
@@ -296,38 +314,45 @@ public class LoginController implements Serializable {
 			return null;
 		}
 	}
-	
-	//PERMISOS
-	private void cargarPermisosUserSession(){
-		try{
-			HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(false);
+
+	// PERMISOS
+	private void cargarPermisosUserSession() {
+		try {
+			HttpSession session = (HttpSession) FacesContext
+					.getCurrentInstance().getExternalContext()
+					.getSession(false);
 			Rol rol = usuarioSession.getRol();
 			List<Permiso> listPermiso = permisoDao.obtenerPorRol(rol);
-			for(Permiso p : listPermiso){
-				session.setAttribute(p.getMenuAccion().getMenu().getNombre(), "AC");
+			for (Permiso p : listPermiso) {
+				session.setAttribute(p.getMenuAccion().getMenu().getNombre(),
+						"AC");
 			}
-		}catch(Exception e){
+		} catch (Exception e) {
 
 		}
 	}
-	
-	public void permisoValidado(String permiso){
+
+	public void permisoValidado(String permiso) {
 		try {
-			System.out.println("permisoValidado("+permiso+")");
+			System.out.println("permisoValidado(" + permiso + ")");
 			FacesContext context = FacesContext.getCurrentInstance();
 			HttpServletRequest request1 = (HttpServletRequest) context
 					.getExternalContext().getRequest();
-			HttpSession request = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(false);
-			String permisoAux = request.getAttribute(permiso)!=null ? (String) request.getAttribute(permiso):"IN";
-			if( ! permisoAux.equals("AC")){
-				FacesContext.getCurrentInstance().getExternalContext()
-				.redirect(request1.getContextPath() +"/error403.xhtml");
+			HttpSession request = (HttpSession) FacesContext
+					.getCurrentInstance().getExternalContext()
+					.getSession(false);
+			String permisoAux = request.getAttribute(permiso) != null ? (String) request
+					.getAttribute(permiso) : "IN";
+			if (!permisoAux.equals("AC")) {
+				FacesContext
+						.getCurrentInstance()
+						.getExternalContext()
+						.redirect(request1.getContextPath() + "/error403.xhtml");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-
 
 	// ----------- Getters and Setters ------------
 

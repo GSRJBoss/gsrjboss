@@ -49,7 +49,7 @@ public class DocumentoIdentidadController implements Serializable {
 
 	/******* LIST **********/
 	private List<DocumentoIdentidad> listaDocumentoIdentidad;
-	private String[] listaEstado = { "ACTIVO", "INACTIVO" };
+	private String[] listaEstado = { "ACTIVO", "INACTIVO", "ELIMINADO" };
 
 	/******* ESTADOS **********/
 	private boolean modificar = false;
@@ -154,8 +154,8 @@ public class DocumentoIdentidadController implements Serializable {
 		documentoIdentidadSelected = new DocumentoIdentidad();
 		listaDocumentoIdentidad = documentoIdentidadDao
 				.obtenerDocumentoIdentidadOrdenAscPorId();
-		// usuario = sessionMain.getUsuarioLogin();
-		// sucursalLogin = sessionMain.getSucursalLogin();
+		usuario = sessionMain.getUsuarioLogin();
+		sucursalLogin = sessionMain.PruebaSucursal();
 		setCrear(true);
 		setModificar(false);
 		setRegistrar(false);
@@ -183,6 +183,17 @@ public class DocumentoIdentidadController implements Serializable {
 		registrar = false;
 		modificar = true;
 		documentoIdentidad = documentoIdentidadSelected;
+		estado = documentoIdentidad.getEstado();
+		if (estado.equals("AC")) {
+			setEstado("ACTIVO");
+		} else {
+			if (estado.equals("IN")) {
+				setEstado("INACTIVO");
+			} else {
+				setEstado("ELIMINADO");
+			}
+		}
+		FacesContext.getCurrentInstance().renderResponse();
 		resetearFitrosTabla("formTableDocumentoIdentidad:dataTableDocumentoIdentidad");
 	}
 
@@ -197,42 +208,24 @@ public class DocumentoIdentidadController implements Serializable {
 		try {
 			if (documentoIdentidad.getNombre().trim().isEmpty()
 					|| documentoIdentidad.getSigla().trim().isEmpty()
-			/*
-			 * || documentoIdentidad.getEstado().trim().isEmpty() ||
-			 * getSucursalLogin() == null || getSucursalLogin().getCompania() ==
-			 * null
-			 */) {
+					|| getSucursalLogin() == null
+					|| getSucursalLogin().getCompania() == null) {
 				FacesUtil.infoMessage("VALIDACION",
 						"No puede haber campos vacíos");
 				return;
 			} else {
-				/*
-				 * documentoIdentidad
-				 * .setCompania(getSucursalLogin().getCompania());
-				 * documentoIdentidad.setSucursal(getSucursalLogin());
-				 * documentoIdentidad.setFechaRegistro(new Date());
-				 * documentoIdentidad.setUsuarioRegistro(sessionMain
-				 * .getUsuarioLogin().getId());
-				 */
+				documentoIdentidad.setSucursal(getSucursalLogin());
+				documentoIdentidad
+						.setCompania(getSucursalLogin().getCompania());
+				documentoIdentidad.setFechaRegistro(new Date());
 				documentoIdentidad.setUsuarioRegistro(sessionMain
-						.PruebaUsuario().getId());
-				documentoIdentidad.setSucursal(sessionMain.PruebaSucursal());
-				documentoIdentidad.setCompania(documentoIdentidad.getSucursal()
-						.getCompania());
+						.getUsuarioLogin().getId());
 				documentoIdentidad.setEstado("AC");
 				documentoIdentidad.setFechaRegistro(new Date());
 				documentoIdentidad.setFechaModificacion(documentoIdentidad
 						.getFechaRegistro());
-				DocumentoIdentidad r = documentoIdentidadDao
-						.registrar(documentoIdentidad);
-				if (r != null) {
-					FacesUtil.infoMessage("DocumentoIdentidad registrado",
-							r.toString());
-					initNew();
-				} else {
-					FacesUtil.errorMessage("Error al registrar");
-					initNew();
-				}
+				documentoIdentidadDao.registrar(documentoIdentidad);
+				initNew();
 			}
 		} catch (Exception e) {
 			System.out.println("Error en registro de documentoIdentidad: "
@@ -251,26 +244,22 @@ public class DocumentoIdentidadController implements Serializable {
 				return;
 			} else {
 				documentoIdentidad.setFechaModificacion(new Date());
-				documentoIdentidad.setUsuarioRegistro(sessionMain
-						.PruebaUsuario().getId());
-				System.out.println(getEstado());
-				documentoIdentidad.setEstado(getEstado());
-				if (getEstado().equals("ACTIVO")) {
+				documentoIdentidad.setUsuarioRegistro(getUsuario().getId());
+				if (getEstado().equals("ACTIVO") || getEstado().equals("AC")) {
 					documentoIdentidad.setEstado("AC");
 				} else {
-					if (getEstado().equals("INACTIVO"))
+					if (getEstado().equals("INACTIVO")
+							|| getEstado().equals("IN")) {
 						documentoIdentidad.setEstado("IN");
+					} else {
+						if (getEstado().equals("ELIMINADO")
+								|| getEstado().equals("RM")) {
+							documentoIdentidad.setEstado("RM");
+						}
+					}
 				}
-				DocumentoIdentidad r = documentoIdentidadDao
-						.modificar(documentoIdentidad);
-				if (r != null) {
-					FacesUtil.infoMessage("DocumentoIdentidad actualizado",
-							r.toString());
-					initNew();
-				} else {
-					FacesUtil.errorMessage("Error al actualizar");
-					initNew();
-				}
+				documentoIdentidadDao.modificar(documentoIdentidad);
+				initNew();
 			}
 		} catch (Exception e) {
 			System.out.println("Error en modificacion de documentoIdentidad: "
@@ -281,14 +270,8 @@ public class DocumentoIdentidadController implements Serializable {
 
 	public void eliminar() {
 		try {
-			if (documentoIdentidadDao.eliminar(documentoIdentidad)) {
-				FacesUtil.infoMessage("DocumentoIdentidad Eliminado",
-						documentoIdentidad.toString());
-				initNew();
-			} else {
-				FacesUtil.errorMessage("Error al eliminar");
-				initNew();
-			}
+			documentoIdentidadDao.eliminar(documentoIdentidad);
+			initNew();
 		} catch (Exception e) {
 			System.out.println("Error en eliminacion de documentoIdentidad: "
 					+ e.getMessage());
@@ -303,12 +286,11 @@ public class DocumentoIdentidadController implements Serializable {
 		}
 	}
 
-	public String endConversation() {
+	public void endConversation() {
 		if (!conversation.isTransient()) {
 			conversation.end();
 			System.out.println(">>>>>>>>>> CONVERSACION TERMINADA...");
 		}
-		return "kardex_producto.xhtml?faces-redirect=true";
 	}
 
 }

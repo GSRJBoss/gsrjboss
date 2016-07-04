@@ -21,6 +21,7 @@ import bo.com.spaps.dao.RazaDao;
 import bo.com.spaps.dao.SessionMain;
 import bo.com.spaps.model.Raza;
 import bo.com.spaps.model.Sucursal;
+import bo.com.spaps.model.Usuario;
 import bo.com.spaps.util.FacesUtil;
 
 @Named("razaController")
@@ -44,10 +45,11 @@ public class RazaController implements Serializable {
 	private Raza raza;
 	private Raza razaSelected;
 	private Sucursal sucursalLogin;
+	private Usuario usuarioLogin;
 
 	/******* LIST **********/
 	private List<Raza> listaRaza;
-	private String[] listaEstado = { "ACTIVO", "INACTIVO" };
+	private String[] listaEstado = { "ACTIVO", "INACTIVO", "ELIMINADO" };
 
 	/******* ESTADOS **********/
 	private boolean modificar = false;
@@ -136,6 +138,14 @@ public class RazaController implements Serializable {
 		this.estado = estado;
 	}
 
+	public Usuario getUsuarioLogin() {
+		return usuarioLogin;
+	}
+
+	public void setUsuarioLogin(Usuario usuarioLogin) {
+		this.usuarioLogin = usuarioLogin;
+	}
+
 	public void cambiarAspecto() {
 		crear = false;
 		registrar = true;
@@ -147,6 +157,17 @@ public class RazaController implements Serializable {
 		registrar = false;
 		modificar = true;
 		raza = razaSelected;
+		estado = raza.getEstado();
+		if (estado.equals("AC")) {
+			setEstado("ACTIVO");
+		} else {
+			if (estado.equals("IN")) {
+				setEstado("INACTIVO");
+			} else {
+				setEstado("ELIMINADO");
+			}
+		}
+		FacesContext.getCurrentInstance().renderResponse();
 		resetearFitrosTabla("formTableRaza:dataTableRaza");
 	}
 
@@ -161,7 +182,8 @@ public class RazaController implements Serializable {
 	public void initNew() {
 		raza = new Raza();
 		razaSelected = new Raza();
-		sucursalLogin = sessionMain.getSucursalLogin();
+		usuarioLogin = sessionMain.getUsuarioLogin();
+		sucursalLogin = sessionMain.PruebaSucursal();
 		listaRaza = razaDao.obtenerRazaOrdenAscPorId();
 		setCrear(true);
 		setModificar(false);
@@ -172,34 +194,20 @@ public class RazaController implements Serializable {
 		try {
 			if (raza.getCodigo().trim().isEmpty()
 					|| raza.getNombre().trim().isEmpty()
-			/*
-			 * || raza.getEstado().trim().isEmpty() || getSucursal() == null ||
-			 * getSucursal().getCompania() == null
-			 */) {
+					|| getSucursal() == null
+					|| getSucursal().getCompania() == null) {
 				FacesUtil.infoMessage("VALIDACION",
 						"No puede haber campos vacíos");
 				return;
 			} else {
-				/*
-				 * raza.setCompania(getSucursal().getCompania());
-				 * raza.setSucursal(getSucursal());
-				 * raza.setUsuarioRegistro(sessionMain
-				 * .getUsuarioLogin().getId());
-				 */
-				raza.setUsuarioRegistro(sessionMain.PruebaUsuario().getId());
-				raza.setSucursal(sessionMain.PruebaSucursal());
-				raza.setCompania(raza.getSucursal().getCompania());
+				raza.setUsuarioRegistro(getUsuarioLogin().getId());
+				raza.setSucursal(getSucursal());
+				raza.setCompania(getSucursal().getCompania());
 				raza.setEstado("AC");
 				raza.setFechaRegistro(new Date());
 				raza.setFechaModificacion(raza.getFechaRegistro());
-				Raza r = razaDao.registrar(raza);
-				if (r != null) {
-					FacesUtil.infoMessage("Raza registrado", r.toString());
-					initNew();
-				} else {
-					FacesUtil.errorMessage("Error al registrar");
-					initNew();
-				}
+				razaDao.registrar(raza);
+				initNew();
 			}
 		} catch (Exception e) {
 			System.out.println("Error en registro de raza: " + e.getMessage());
@@ -211,36 +219,31 @@ public class RazaController implements Serializable {
 		try {
 			if (raza.getCodigo().trim().isEmpty()
 					|| raza.getNombre().trim().isEmpty()
-			/*
-			 * || raza.getEstado().trim().isEmpty() || getSucursal() == null ||
-			 * getSucursal().getCompania() == null
-			 */) {
+					|| raza.getEstado().trim().isEmpty()
+					|| getSucursal() == null
+					|| getSucursal().getCompania() == null) {
 				FacesUtil.infoMessage("VALIDACION",
 						"No puede haber campos vacíos");
 				return;
 			} else {
-				/*
-				 * raza.setCompania(getSucursal().getCompania());
-				 * raza.setSucursal(getSucursal());
-				 */
 				raza.setFechaModificacion(new Date());
-				raza.setUsuarioRegistro(sessionMain.PruebaUsuario().getId());
-				raza.setEstado(getEstado());
-				if (getEstado().equals("ACTIVO")) {
+				raza.setUsuarioRegistro(getUsuarioLogin().getId());
+				if (getEstado().equals("ACTIVO") || getEstado().equals("AC")) {
 					raza.setEstado("AC");
 				} else {
-					if (getEstado().equals("INACTIVO"))
+					if (getEstado().equals("INACTIVO")
+							|| getEstado().equals("IN")) {
 						raza.setEstado("IN");
-				}
-				Raza r = razaDao.modificar(raza);
-				if (r != null) {
-					FacesUtil.infoMessage("Raza actualizado", r.toString());
-					initNew();
-				} else {
-					FacesUtil.errorMessage("Error al actualizar");
-					initNew();
+					} else {
+						if (getEstado().equals("ELIMINADO")
+								|| getEstado().equals("RM")) {
+						}
+						raza.setEstado("RM");
+					}
 				}
 			}
+			razaDao.modificar(raza);
+			initNew();
 		} catch (Exception e) {
 			System.out.println("Error en modificacion de raza: "
 					+ e.getMessage());
@@ -250,13 +253,8 @@ public class RazaController implements Serializable {
 
 	public void eliminar() {
 		try {
-			if (razaDao.eliminar(raza)) {
-				FacesUtil.infoMessage("Raza Eliminado", raza.toString());
-				initNew();
-			} else {
-				FacesUtil.errorMessage("Error al eliminar");
-				initNew();
-			}
+			razaDao.eliminar(raza);
+			initNew();
 		} catch (Exception e) {
 			System.out.println("Error en eliminacion de raza: "
 					+ e.getMessage());

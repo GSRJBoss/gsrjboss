@@ -22,6 +22,16 @@ import bo.com.spaps.util.W;
 public class RazaDao extends
 		DataAccessObjectJpa<Raza, E, R, S, O, P, Q, U, V, W> {
 
+	private boolean isDelete = false;
+
+	public boolean isDelete() {
+		return isDelete;
+	}
+
+	public void setDelete(boolean isDelete) {
+		this.isDelete = isDelete;
+	}
+
 	public RazaDao() {
 		super(Raza.class);
 	}
@@ -52,8 +62,9 @@ public class RazaDao extends
 			beginTransaction();
 			Raza = update(Raza);
 			commitTransaction();
-			FacesUtil.infoMessage("Modificación Correcta",
-					"Raza " + Raza.getNombre());
+			if (!isDelete())
+				FacesUtil.infoMessage("Modificación Correcta",
+						"Raza " + Raza.getNombre());
 			return Raza;
 		} catch (Exception e) {
 			String cause = e.getMessage();
@@ -61,7 +72,8 @@ public class RazaDao extends
 					.contains("org.hibernate.exception.ConstraintViolationException: could not execute statement")) {
 				FacesUtil.errorMessage("Ya existe un registro igual.");
 			} else {
-				FacesUtil.errorMessage("Error al modificar");
+				if (!isDelete())
+					FacesUtil.errorMessage("Error al modificar");
 			}
 			rollbackTransaction();
 			return null;
@@ -70,8 +82,12 @@ public class RazaDao extends
 
 	public boolean eliminar(Raza Raza) {
 		try {
+			setDelete(true);
 			Raza.setEstado("RM");
 			Raza bar = modificar(Raza);
+			FacesUtil.infoMessage("Eliminación Correcta", "Grupo Sanguineo "
+					+ Raza.toString());
+			setDelete(false);
 			return bar != null ? true : false;
 		} catch (Exception e) {
 			FacesUtil.errorMessage("Error al eliminar");
